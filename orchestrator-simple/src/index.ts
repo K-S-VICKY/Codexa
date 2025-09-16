@@ -20,6 +20,10 @@ const networkingV1Api = kubeconfig.makeApiClient(NetworkingV1Api);
 
 // Updated utility function to handle multi-document YAML files
 const readAndParseKubeYaml = (filePath: string, replId: string): Array<any> => {
+    console.log("Attempting to read file at:", filePath);
+    console.log("File exists:", fs.existsSync(filePath));
+    console.log("Current working directory:", process.cwd());
+    console.log("__dirname:", __dirname);
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const docs = yaml.parseAllDocuments(fileContent).map((doc) => {
         let docString = doc.toString();
@@ -36,17 +40,46 @@ app.post("/start", async (req, res) => {
     const namespace = "default"; // Assuming a default namespace, adjust as needed
 
     try {
-        const kubeManifests = readAndParseKubeYaml(path.join(__dirname, "../service.yaml"), replId);
+        const servicePath = path.resolve(__dirname, "../service.yaml");
+        console.log("Looking for service.yaml at:", servicePath);
+        const kubeManifests = readAndParseKubeYaml(servicePath, replId);
         for (const manifest of kubeManifests) {
             switch (manifest.kind) {
                 case "Deployment":
-                    await appsV1Api.createNamespacedDeployment(namespace, manifest);
+                    try {
+                        await appsV1Api.createNamespacedDeployment(namespace, manifest);
+                        console.log(`Deployment ${manifest.metadata.name} created successfully`);
+                    } catch (error: any) {
+                        if (error.statusCode === 409) {
+                            console.log(`Deployment ${manifest.metadata.name} already exists, skipping...`);
+                        } else {
+                            throw error;
+                        }
+                    }
                     break;
                 case "Service":
-                    await coreV1Api.createNamespacedService(namespace, manifest);
+                    try {
+                        await coreV1Api.createNamespacedService(namespace, manifest);
+                        console.log(`Service ${manifest.metadata.name} created successfully`);
+                    } catch (error: any) {
+                        if (error.statusCode === 409) {
+                            console.log(`Service ${manifest.metadata.name} already exists, skipping...`);
+                        } else {
+                            throw error;
+                        }
+                    }
                     break;
                 case "Ingress":
-                    await networkingV1Api.createNamespacedIngress(namespace, manifest);
+                    try {
+                        await networkingV1Api.createNamespacedIngress(namespace, manifest);
+                        console.log(`Ingress ${manifest.metadata.name} created successfully`);
+                    } catch (error: any) {
+                        if (error.statusCode === 409) {
+                            console.log(`Ingress ${manifest.metadata.name} already exists, skipping...`);
+                        } else {
+                            throw error;
+                        }
+                    }
                     break;
                 default:
                     console.log(`Unsupported kind: ${manifest.kind}`);
