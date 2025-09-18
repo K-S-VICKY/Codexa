@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { keyframes } from '@emotion/react';
+import { keyframes, css } from '@emotion/react';
 
 const shimmer = keyframes`
   0% { transform: translateX(-100%); }
@@ -10,6 +10,11 @@ const shimmer = keyframes`
 const ripple = keyframes`
   0% { transform: scale(0); opacity: 1; }
   100% { transform: scale(4); opacity: 0; }
+`;
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
 const BaseButton = styled.button<{
@@ -121,7 +126,7 @@ const BaseButton = styled.button<{
   }
   
   /* Shimmer effect for loading */
-  ${props => props.isLoading && `
+  ${props => props.isLoading && css`
     &::before {
       content: '';
       position: absolute;
@@ -146,10 +151,7 @@ const LoadingSpinner = styled.div`
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top: 2px solid currentColor;
   border-radius: 50%;
-  animation: ${keyframes`
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  `} 1s linear infinite;
+  animation: ${spin} 1s linear infinite;
 `;
 
 const RippleEffect = styled.span`
