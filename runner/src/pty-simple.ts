@@ -26,26 +26,30 @@ export class SimpleTerminalManager {
 
         try {
             console.log(`Spawning shell: ${SHELL} in /workspace`);
-            const childProcess = spawn(SHELL, [], {
+            const childProcess = spawn(SHELL, ['--login', '-i'], {
                 cwd: '/workspace',
                 env: {
                     ...process.env,
                     TERM: 'xterm-256color',
                     COLORTERM: 'truecolor',
-                    PS1: '\\u@\\h:\\w$ '
+                    PS1: '\\u@\\h:\\w$ ',
+                    HOME: '/workspace',
+                    USER: 'coder',
+                    SHELL: '/bin/bash',
+                    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
                 },
                 stdio: ['pipe', 'pipe', 'pipe']
             });
 
             console.log(`Process created successfully - PID: ${childProcess.pid}`);
 
-            // Send initial welcome message and prompt
+            // Send initial welcome message and trigger prompt
             setTimeout(() => {
-                onData(`\x1b[32mTerminal ready!\x1b[0m\r\n`, childProcess.pid || 0);
+                onData(`\r\n\x1b[32mTerminal ready!\x1b[0m\r\n`, childProcess.pid || 0);
                 onData(`\x1b[36mWorkspace: /workspace\x1b[0m\r\n`, childProcess.pid || 0);
-                // Send a command to show current directory and trigger prompt
-                childProcess.stdin?.write('pwd\n');
-            }, 100);
+                // Send empty command to trigger prompt display
+                childProcess.stdin?.write('echo "Shell initialized"\n');
+            }, 300);
 
             // Handle stdout data
             childProcess.stdout?.on('data', (data: Buffer) => {

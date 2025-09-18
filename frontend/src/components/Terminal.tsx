@@ -10,12 +10,35 @@ function ab2str(buf: ArrayBuffer) {
 }
 
 const OPTIONS_TERM = {
-    useStyle: true,
-    screenKeys: true,
     cursorBlink: true,
-    cols: 200,
+    cols: 80,
+    rows: 24,
+    convertEol: true,
+    allowTransparency: false,
+    fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+    fontSize: 14,
+    lineHeight: 1.2,
     theme: {
-        background: "black"
+        background: "#1e1e1e",
+        foreground: "#ffffff",
+        cursor: "#ffffff",
+        selection: "#3a3d41",
+        black: "#000000",
+        red: "#cd3131",
+        green: "#0dbc79",
+        yellow: "#e5e510",
+        blue: "#2472c8",
+        magenta: "#bc3fbc",
+        cyan: "#11a8cd",
+        white: "#e5e5e5",
+        brightBlack: "#666666",
+        brightRed: "#f14c4c",
+        brightGreen: "#23d18b",
+        brightYellow: "#f5f543",
+        brightBlue: "#3b8eea",
+        brightMagenta: "#d670d6",
+        brightCyan: "#29b8db",
+        brightWhite: "#e5e5e5"
     }
 };
 
