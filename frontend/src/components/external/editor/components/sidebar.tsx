@@ -1,20 +1,44 @@
-import React, {ReactNode} from 'react';
-import styled from "@emotion/styled";
+import React from 'react';
+import styled from '@emotion/styled';
+import { FileExplorerToolbar } from '../../../FileExplorerToolbar';
 
-export const Sidebar = ({children}: { children: ReactNode }) => {
-  return (
-    <Aside>
-      {children}
-    </Aside>
-  )
+interface SidebarProps {
+  children: React.ReactNode;
+  onNewFile?: () => void;
+  onNewFolder?: () => void;
+  onRefresh?: () => void;
 }
 
-const Aside = styled.aside`
-  width: 250px;
-  height: 100vh;
-  border-right: 2px solid;
-  border-color: #242424;
-  padding-top: 3px;
-`
+const Sidebar: React.FC<SidebarProps> = ({ children, onNewFile, onNewFolder, onRefresh }) => {
+  return (
+    <Container>
+      {(onNewFile || onNewFolder || onRefresh) && (
+        <FileExplorerToolbar
+          onNewFile={onNewFile || (() => {})}
+          onNewFolder={onNewFolder || (() => {})}
+          onRefresh={onRefresh || (() => {})}
+        />
+      )}
+      <Content>
+        {children}
+      </Content>
+    </Container>
+  );
+};
 
-export default Sidebar
+export default Sidebar;
+
+const Container = styled.div`
+  width: 300px;
+  height: 100vh;
+  background: #252526;
+  border-right: 1px solid #3e3e42;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Content = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+`;

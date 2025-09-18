@@ -106,3 +106,14 @@ export const saveToS3 = async (key: string, filePath: string, content: string): 
 
     await s3.putObject(params).promise()
 }
+
+export const createFolderInS3 = async (key: string, folderPath: string): Promise<void> => {
+    // Create a .gitkeep file to make the folder visible in S3/R2
+    const params = {
+        Bucket: process.env.S3_BUCKET ?? "",
+        Key: `${key}${folderPath}/.gitkeep`,
+        Body: ""
+    }
+
+    await s3.putObject(params).promise()
+}

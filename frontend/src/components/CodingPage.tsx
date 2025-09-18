@@ -177,6 +177,14 @@ export const CodingPagePostPodCreation = () => {
         }
     }, [socket]);
 
+    const refreshFileStructure = () => {
+        if (socket) {
+            socket.emit("fetchDir", "", (data: RemoteFile[]) => {
+                setFileStructure(data);
+            });
+        }
+    };
+
     const onSelect = (file: File) => {
         if (file.type === Type.DIRECTORY) {
             socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
@@ -234,7 +242,7 @@ export const CodingPagePostPodCreation = () => {
             </Header>
             <Workspace>
                 <LeftPanel>
-                    {socket && <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} files={fileStructure} />}
+                    {socket && <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} onRefresh={refreshFileStructure} files={fileStructure} />}
                 </LeftPanel>
                 <RightPanel>
                     {showOutput && <Output />}
