@@ -29,10 +29,10 @@ export const Editor = ({
   const [showNewFolderDialog, setShowNewFolderDialog] = useState(false);
 
   useEffect(() => {
-    if (!selectedFile) {
+    if (!selectedFile && rootDir.files.length > 0) {
       onSelect(rootDir.files[0])
     }
-  }, [selectedFile])
+  }, [selectedFile, rootDir.files])
 
   const handleNewFile = () => {
     setShowNewFileDialog(true);

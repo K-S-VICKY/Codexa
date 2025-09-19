@@ -56,7 +56,16 @@ export const TerminalComponent = ({ socket }: {socket: Socket}) => {
         const term = new Terminal(OPTIONS_TERM);
         term.loadAddon(fitAddon);
         term.open(terminalRef.current);
-        fitAddon.fit();
+        
+        // Wait for DOM to be ready before fitting
+        setTimeout(() => {
+            try {
+                fitAddon.fit();
+            } catch (error) {
+                console.warn('Terminal fit failed:', error);
+            }
+        }, 100);
+        
         termRef.current = term;
         setIsTerminalReady(true);
 

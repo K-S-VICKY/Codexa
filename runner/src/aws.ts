@@ -117,3 +117,34 @@ export const createFolderInS3 = async (key: string, folderPath: string): Promise
 
     await s3.putObject(params).promise()
 }
+
+export const deleteFromS3 = async (key: string, filePath: string): Promise<void> => {
+    const params = {
+        Bucket: process.env.S3_BUCKET ?? "",
+        Key: `${key}${filePath}`
+    }
+
+    await s3.deleteObject(params).promise()
+}
+
+export const deleteFolderFromS3 = async (key: string, folderPath: string): Promise<void> => {
+    // List all objects with the folder prefix
+    const listParams = {
+        Bucket: process.env.S3_BUCKET ?? "",
+        Prefix: `${key}${folderPath}/`
+    }
+
+    const listedObjects = await s3.listObjectsV2(listParams).promise()
+    
+    if (listedObjects.Contents && listedObjects.Contents.length > 0) {
+        // Delete all objects in the folder
+        const deleteParams = {
+            Bucket: process.env.S3_BUCKET ?? "",
+            Delete: {
+                Objects: listedObjects.Contents.map(obj => ({ Key: obj.Key! }))
+            }
+        }
+        
+        await s3.deleteObjects(deleteParams).promise()
+    }
+}

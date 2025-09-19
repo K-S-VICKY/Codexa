@@ -1,13 +1,20 @@
 # Use the official Node.js 20 as a parent image
 FROM node:20
 
+# Install build dependencies for node-pty
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /code
 
 # Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies with node-pty compilation
 RUN echo "=== Installing npm dependencies ===" && \
     npm ci --verbose && \
     echo "=== Dependencies installed successfully ==="

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@lydell/node-pty": "^1.1.0",
     "@types/express": "^4.17.21",
     "aws-sdk": "^2.1559.0",
     "cors": "^2.8.5",

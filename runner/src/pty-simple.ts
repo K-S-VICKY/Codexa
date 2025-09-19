@@ -1,13 +1,13 @@
-import { spawn, ChildProcess } from 'child_process';
+import * as pty from '@lydell/node-pty';
 
 const SHELL = "bash";
 
 export class SimpleTerminalManager {
-    private sessions: { [id: string]: { process: ChildProcess, replId: string } } = {};
+    private sessions: { [id: string]: { process: pty.IPty, replId: string } } = {};
 
     constructor() {
         this.sessions = {};
-        console.log("SimpleTerminalManager initialized (using child_process)");
+        console.log("SimpleTerminalManager initialized (using @lydell/node-pty)");
     }
     
     createPty(id: string, replId: string, onData: (data: string, id: number) => void) {
@@ -26,60 +26,51 @@ export class SimpleTerminalManager {
 
         try {
             console.log(`Spawning shell: ${SHELL} in /workspace`);
-            const childProcess = spawn(SHELL, ['--login', '-i'], {
+            // Use @lydell/node-pty for true PTY functionality with interactive commands
+            const childProcess = pty.spawn('bash', ['--login', '-i'], {
+                name: 'xterm-256color',
+                cols: 80,
+                rows: 24,
                 cwd: '/workspace',
                 env: {
                     ...process.env,
                     TERM: 'xterm-256color',
                     COLORTERM: 'truecolor',
-                    PS1: '\\u@\\h:\\w$ ',
+                    PS1: '\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ ',
                     HOME: '/workspace',
                     USER: 'coder',
                     SHELL: '/bin/bash',
-                    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-                },
-                stdio: ['pipe', 'pipe', 'pipe']
+                    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+                    // Force interactive/TTY mode for CLI tools
+                    FORCE_COLOR: '1',
+                    NPM_CONFIG_COLOR: 'always',
+                    CLICOLOR: '1',
+                    CLICOLOR_FORCE: '1'
+                }
             });
 
             console.log(`Process created successfully - PID: ${childProcess.pid}`);
 
-            // Send initial welcome message and trigger prompt
+            // Send initial setup commands
             setTimeout(() => {
-                onData(`\r\n\x1b[32mTerminal ready!\x1b[0m\r\n`, childProcess.pid || 0);
+                onData(`\r\n\x1b[32mTerminal ready! Interactive mode enabled.\x1b[0m\r\n`, childProcess.pid || 0);
                 onData(`\x1b[36mWorkspace: /workspace\x1b[0m\r\n`, childProcess.pid || 0);
-                // Send empty command to trigger prompt display
-                childProcess.stdin?.write('echo "Shell initialized"\n');
-            }, 300);
+                // Initialize with a simple command to show prompt
+                childProcess.write('echo "Terminal initialized"\n');
+            }, 500);
 
-            // Handle stdout data
-            childProcess.stdout?.on('data', (data: Buffer) => {
+            // Handle PTY data output
+            childProcess.onData((data: string) => {
                 try {
-                    const output = data.toString();
-                    console.log(`Terminal ${id} stdout:`, output.replace(/\r?\n/g, '\\n'));
-                    onData(output, childProcess.pid || 0);
+                    console.log(`Terminal ${id} data:`, JSON.stringify(data));
+                    onData(data, childProcess.pid || 0);
                 } catch (error) {
                     console.error(`Error in terminal data handler for ${id}:`, error);
                 }
             });
 
-            // Handle stderr data
-            childProcess.stderr?.on('data', (data: Buffer) => {
-                try {
-                    const output = data.toString();
-                    console.log(`Terminal ${id} stderr:`, output.replace(/\r?\n/g, '\\n'));
-                    onData(output, childProcess.pid || 0);
-                } catch (error) {
-                    console.error(`Error in terminal stderr handler for ${id}:`, error);
-                }
-            });
-
-            childProcess.on('exit', (code: number | null, signal: string | null) => {
-                console.log(`Terminal ${id} exited with code ${code}, signal ${signal}`);
-                delete this.sessions[id];
-            });
-
-            childProcess.on('error', (error: Error) => {
-                console.error(`Terminal ${id} error:`, error);
+            childProcess.onExit(({ exitCode, signal }: { exitCode: number, signal?: number }) => {
+                console.log(`Terminal ${id} exited with code ${exitCode}, signal ${signal}`);
                 delete this.sessions[id];
             });
 
@@ -98,10 +89,12 @@ export class SimpleTerminalManager {
     }
 
     write(terminalId: string, data: string) {
-        if (this.sessions[terminalId]?.process?.stdin) {
+        if (this.sessions[terminalId]?.process) {
             try {
-                this.sessions[terminalId].process.stdin?.write(data);
-                console.log(`Data written to terminal ${terminalId}: ${data.replace(/\r?\n/g, '\\n')}`);
+                // With @lydell/node-pty, we can write data directly without complex processing
+                // PTY handles all the terminal control sequences properly
+                this.sessions[terminalId].process.write(data);
+                console.log(`Data written to terminal ${terminalId}:`, JSON.stringify(data));
             } catch (error) {
                 console.error(`Error writing to terminal ${terminalId}:`, error);
             }
@@ -115,7 +108,7 @@ export class SimpleTerminalManager {
             try {
                 const pid = this.sessions[terminalId].process.pid;
                 this.sessions[terminalId].process.kill();
-                console.log(`✓ Cleared simple terminal session ${terminalId} (PID: ${pid})`);
+                console.log(`✓ Cleared PTY terminal session ${terminalId} (PID: ${pid})`);
             } catch (error) {
                 console.error(`Error killing terminal ${terminalId}:`, error);
             }

@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
-import { saveToS3, createFolderInS3 } from "./aws";
+import { saveToS3, createFolderInS3, deleteFromS3, deleteFolderFromS3 } from "./aws";
 import { fetchDir, fetchFileContent, saveFile } from "./fs";
 import { SimpleTerminalManager } from "./pty-simple";
 import * as fs from "fs";
@@ -205,10 +205,15 @@ function initHandlers(socket: Socket, replId: string) {
             const fs = require('fs').promises;
             const stats = await fs.stat(fullPath);
             
+            // Delete from local filesystem
             if (stats.isDirectory()) {
                 await fs.rmdir(fullPath, { recursive: true });
+                // Delete folder from S3/R2
+                await deleteFolderFromS3(`code/${replId}/`, path);
             } else {
                 await fs.unlink(fullPath);
+                // Delete file from S3/R2
+                await deleteFromS3(`code/${replId}/`, path);
             }
             
             callback({ success: true });
