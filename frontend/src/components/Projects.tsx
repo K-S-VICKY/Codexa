@@ -221,13 +221,17 @@ export const Projects = () => {
     }
   };
 
+  const [startingProject, setStartingProject] = useState<string | null>(null);
+
   const openProject = async (proj: Project) => {
     try {
+      setStartingProject(proj.replId);
       // Trigger orchestrator start, then navigate to coding
       await axios.post(`${ORCH_SERVICE}/start`, { replId: proj.replId });
       navigate(`/coding/?replId=${proj.replId}`);
     } catch (error) {
       console.error('Failed to start project:', error);
+      setStartingProject(null);
     }
   };
 
@@ -286,15 +290,31 @@ export const Projects = () => {
         ) : (
           <ProjectsGrid>
             {projects.map((project) => (
-              <ProjectCard key={project._id} onClick={() => openProject(project)}>
+              <ProjectCard 
+                key={project._id} 
+                onClick={() => startingProject !== project.replId && openProject(project)}
+                style={{ 
+                  opacity: startingProject === project.replId ? 0.7 : 1,
+                  cursor: startingProject === project.replId ? 'wait' : 'pointer'
+                }}
+              >
                 <ProjectName>{project.replId}</ProjectName>
                 <ProjectMeta>
                   <LanguageBadge>{project.language}</LanguageBadge>
                   <ProjectId>#{project._id.slice(-6)}</ProjectId>
                 </ProjectMeta>
-                <Button variant="ghost" size="sm" style={{ width: '100%' }}>
-                  Open Project →
-                </Button>
+                {startingProject === project.replId ? (
+                  <Button variant="ghost" size="sm" style={{ width: '100%' }} disabled>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                      <LoadingSpinner variant="dots" />
+                      Starting Pod...
+                    </div>
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="sm" style={{ width: '100%' }}>
+                    Open Project →
+                  </Button>
+                )}
               </ProjectCard>
             ))}
           </ProjectsGrid>

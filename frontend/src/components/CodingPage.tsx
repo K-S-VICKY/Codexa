@@ -1,58 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Socket, io } from 'socket.io-client';
 import { Editor } from './Editor';
 import { File, RemoteFile, Type } from './external/editor/utils/file-manager';
 import { useSearchParams } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Output } from './Output';
-import { TerminalComponent as Terminal } from './Terminal';
-import { LoadingSpinner } from './LoadingSpinner';
+import { TerminalComponent } from './Terminal';
+import { PortSelector } from './PortSelector';
+import { useSocket } from '../hooks/useSocket';
 import { Button } from './Button';
+import { LoadingSpinner } from './LoadingSpinner';
 import axios from 'axios';
-
-function useSocket(replId: string) {
-    const [socket, setSocket] = useState<Socket | null>(null);
-
-    useEffect(() => {
-        const newSocket = io(`ws://${replId}.davish.tech`, {
-            transports: ['websocket', 'polling'],
-            timeout: 20000,
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: 5,
-            forceNew: true
-        });
-
-        newSocket.on('connect', () => {
-            console.log('Socket connected:', newSocket.id);
-        });
-
-        newSocket.on('disconnect', (reason) => {
-            console.log('Socket disconnected:', reason);
-        });
-
-        newSocket.on('reconnect', (attemptNumber) => {
-            console.log('Socket reconnected after', attemptNumber, 'attempts');
-        });
-
-        newSocket.on('reconnect_error', (error) => {
-            console.error('Socket reconnection error:', error);
-        });
-
-        newSocket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-        });
-
-        setSocket(newSocket);
-
-        return () => {
-            newSocket.disconnect();
-        };
-    }, [replId]);
-
-    return socket;
-}
 
 const Container = styled.div`
   display: flex;
@@ -163,10 +119,11 @@ export const CodingPagePostPodCreation = () => {
     const [searchParams] = useSearchParams();
     const replId = searchParams.get('replId') ?? '';
     const [loaded, setLoaded] = useState(false);
-    const socket = useSocket(replId);
+    const { socket } = useSocket(replId);
     const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-    const [showOutput, setShowOutput] = useState(false);
+    const [showPortSelector, setShowPortSelector] = useState(false);
+    const [selectedPort, setSelectedPort] = useState<number>(3000);
 
     useEffect(() => {
         if (socket) {
@@ -232,11 +189,11 @@ export const CodingPagePostPodCreation = () => {
                         Connected
                     </StatusIndicator>
                     <Button 
-                        variant={showOutput ? "secondary" : "primary"} 
+                        variant="primary" 
                         size="sm"
-                        onClick={() => setShowOutput(!showOutput)}
+                        onClick={() => setShowPortSelector(true)}
                     >
-                        {showOutput ? 'Hide Output' : 'Show Output'}
+                        Open Port in New Tab
                     </Button>
                 </ButtonContainer>
             </Header>
@@ -245,10 +202,20 @@ export const CodingPagePostPodCreation = () => {
                     {socket && <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} onRefresh={refreshFileStructure} files={fileStructure} />}
                 </LeftPanel>
                 <RightPanel>
-                    {showOutput && <Output />}
-                    {socket && <Terminal socket={socket} />}
+                    {socket && <TerminalComponent socket={socket} />}
                 </RightPanel>
             </Workspace>
+            <PortSelector
+                isOpen={showPortSelector}
+                onClose={() => setShowPortSelector(false)}
+                onSelectPort={(port) => {
+                    setSelectedPort(port);
+                    // Open port in new tab
+                    const url = `http://${replId}-${port}.vigneshks.tech`;
+                    window.open(url, '_blank');
+                }}
+                currentPort={selectedPort}
+            />
         </Container>
     );
 }

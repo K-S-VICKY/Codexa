@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {Directory, File, sortDir, sortFile, Type} from "../utils/file-manager";
 import {getIcon} from "./icon";
 import styled from "@emotion/styled";
@@ -38,7 +38,7 @@ export const FileTree = (props: FileTreeProps) => {
         { label: 'New Folder', icon: '📁', onClick: () => setInputDialog({type: 'folder', parentPath: ''}) }
       );
     } else {
-      if (file.type === Type.Directory) { // Directory
+      if (file.type === Type.DIRECTORY) { // Directory
         items.push(
           { label: 'New File', icon: '📄', onClick: () => setInputDialog({type: 'file', parentPath: file.path}) },
           { label: 'New Folder', icon: '📁', onClick: () => setInputDialog({type: 'folder', parentPath: file.path}) },
@@ -110,7 +110,7 @@ export const FileTree = (props: FileTreeProps) => {
   const handleDelete = async (file: File | Directory) => {
     if (!props.socket) return;
     
-    const confirmMessage = file.type === Type.Directory 
+    const confirmMessage = file.type === Type.DIRECTORY 
       ? `Are you sure you want to delete the folder "${file.name}" and all its contents?`
       : `Are you sure you want to delete the file "${file.name}"?`;
     
@@ -236,14 +236,14 @@ const FileDiv = ({file, icon, selectedFile, onClick, onContextMenu}: {
 
   const handleDragOver = (e: React.DragEvent) => {
     // Only allow drop on directories
-    if (file.type === Type.Directory) { // Directory
+    if (file.type === Type.DIRECTORY) { // Directory
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
       setIsDragOver(true);
     }
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (_e: React.DragEvent) => {
     setIsDragOver(false);
   };
 
@@ -251,7 +251,7 @@ const FileDiv = ({file, icon, selectedFile, onClick, onContextMenu}: {
     e.preventDefault();
     setIsDragOver(false);
     
-    if (file.type !== Type.Directory) return; // Only allow drop on directories
+    if (file.type !== Type.DIRECTORY) return; // Only allow drop on directories
     
     try {
       const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));

@@ -17,7 +17,17 @@ export class SimpleTerminalManager {
         if (this.sessions[id]) {
             console.log(`Cleaning up existing terminal session for ${id}`);
             try {
-                this.sessions[id].process.kill();
+                this.sessions[id].process.kill('SIGTERM');
+                // Give it a moment to clean up
+                setTimeout(() => {
+                    if (this.sessions[id]) {
+                        try {
+                            this.sessions[id].process.kill('SIGKILL');
+                        } catch (error) {
+                            console.error("Error force killing terminal:", error);
+                        }
+                    }
+                }, 1000);
             } catch (error) {
                 console.error("Error killing existing terminal:", error);
             }
@@ -72,6 +82,12 @@ export class SimpleTerminalManager {
             childProcess.onExit(({ exitCode, signal }: { exitCode: number, signal?: number }) => {
                 console.log(`Terminal ${id} exited with code ${exitCode}, signal ${signal}`);
                 delete this.sessions[id];
+                
+                // Notify about unexpected exits
+                if (exitCode !== 0 && signal !== 15) { // Not normal exit or SIGTERM
+                    console.warn(`Terminal ${id} exited unexpectedly: code=${exitCode}, signal=${signal}`);
+                    onData(`\r\n\x1b[31mTerminal session ended unexpectedly. Reconnecting...\x1b[0m\r\n`, 0);
+                }
             });
 
             this.sessions[id] = {
@@ -107,7 +123,22 @@ export class SimpleTerminalManager {
         if (this.sessions[terminalId]) {
             try {
                 const pid = this.sessions[terminalId].process.pid;
-                this.sessions[terminalId].process.kill();
+                // Try graceful termination first
+                this.sessions[terminalId].process.kill('SIGTERM');
+                
+                // Force kill after timeout if still running
+                setTimeout(() => {
+                    if (this.sessions[terminalId]) {
+                        try {
+                            this.sessions[terminalId].process.kill('SIGKILL');
+                            console.log(`✓ Force killed PTY terminal session ${terminalId} (PID: ${pid})`);
+                        } catch (error) {
+                            console.error(`Error force killing terminal ${terminalId}:`, error);
+                        }
+                        delete this.sessions[terminalId];
+                    }
+                }, 2000);
+                
                 console.log(`✓ Cleared PTY terminal session ${terminalId} (PID: ${pid})`);
             } catch (error) {
                 console.error(`Error killing terminal ${terminalId}:`, error);

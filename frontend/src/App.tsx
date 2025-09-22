@@ -1,7 +1,7 @@
 import './App.css'
 import { CodingPage } from './components/CodingPage'
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { Landing } from './components/Landing';
+// import { Landing } from './components/Landing';
 import { Login } from './components/Login';
 import { Projects } from './components/Projects';
 

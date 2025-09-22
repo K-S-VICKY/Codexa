@@ -32,10 +32,10 @@ export const Code = ({ selectedFile, socket }: { selectedFile: File | undefined,
         language={language}
         value={code}
         theme="vs-dark"
-        onChange={debounce((value) => {
+        onChange={debounce((value: string | undefined) => {
           // Should send diffs, for now sending the whole file
           // PR and win a bounty!
-          socket.emit("updateContent", { path: selectedFile.path, content: value });
+          socket.emit("updateContent", { path: selectedFile.path, content: value || "" });
         }, 500)}
       />
   )
