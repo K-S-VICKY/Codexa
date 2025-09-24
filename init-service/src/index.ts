@@ -6,6 +6,7 @@ dotenv.config()
 import { copyS3Folder } from "./aws";
 import { authRouter, authMiddleware } from "./auth";
 import { projectsRouter } from "./projects";
+import { tasksRouter } from "./tasks";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,9 @@ app.use("/auth", authRouter);
 
 // Protected project routes
 app.use(authMiddleware, projectsRouter);
+
+// Protected task routes
+app.use(authMiddleware, tasksRouter);
 
 const port = process.env.PORT || 3001;
 
