@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import Sidebar from "./external/editor/components/sidebar";
+import { EnhancedSidebar } from "./external/editor/components/enhanced-sidebar";
 import { Code } from "./external/editor/editor/code";
 import styled from "@emotion/styled";
 import { File, buildFileTree, RemoteFile } from "./external/editor/utils/file-manager";
 import { FileTree } from "./external/editor/components/file-tree";
 import { Socket } from "socket.io-client";
 import { InputDialog } from "./InputDialog";
+import { useSearchParams } from "react-router-dom";
 
 // credits - https://codesandbox.io/s/monaco-tree-pec7u
 export const Editor = ({
@@ -13,13 +14,17 @@ export const Editor = ({
     onSelect,
     selectedFile,
     socket,
-    onRefresh
+    onRefresh,
+    projectId,
+    userId
 }: {
     files: RemoteFile[];
     onSelect: (file: File) => void;
     selectedFile: File | undefined;
     socket: Socket;
     onRefresh?: () => void;
+    projectId?: string;
+    userId?: string;
 }) => {
   const rootDir = useMemo(() => {
     return buildFileTree(files);
@@ -71,10 +76,12 @@ export const Editor = ({
   return (
     <div>
       <Main>
-        <Sidebar
+        <EnhancedSidebar
           onNewFile={handleNewFile}
           onNewFolder={handleNewFolder}
           onRefresh={onRefresh}
+          projectId={projectId}
+          userId={userId}
         >
           <FileTree
             rootDir={rootDir}
@@ -83,7 +90,7 @@ export const Editor = ({
             socket={socket}
             onRefresh={onRefresh}
           />
-        </Sidebar>
+        </EnhancedSidebar>
         <Code socket={socket} selectedFile={selectedFile} />
       </Main>
       

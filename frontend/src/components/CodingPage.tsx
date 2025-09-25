@@ -124,6 +124,10 @@ export const CodingPagePostPodCreation = () => {
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [showPortSelector, setShowPortSelector] = useState(false);
     const [selectedPort, setSelectedPort] = useState<number>(3000);
+    
+    // Get user info from localStorage or context
+    const [userId, setUserId] = useState<string | undefined>(undefined);
+    const [projectId, setProjectId] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         if (socket) {
@@ -133,6 +137,30 @@ export const CodingPagePostPodCreation = () => {
             });
         }
     }, [socket]);
+
+    useEffect(() => {
+        // Get user info from localStorage
+        const token = localStorage.getItem('codexa_jwt');
+        const userInfo = localStorage.getItem('codexa_user');
+        
+        if (token) {
+            if (userInfo) {
+                try {
+                    const user = JSON.parse(userInfo);
+                    setUserId(user.id || user._id || 'mock-user-id');
+                } catch (error) {
+                    console.error('Failed to parse user info:', error);
+                    setUserId('mock-user-id');
+                }
+            } else {
+                // Fallback to mock user ID if user info is not available
+                setUserId('mock-user-id');
+            }
+        }
+        
+        // For now, use replId as projectId - in a real app, you'd fetch the project details
+        setProjectId(replId);
+    }, [replId]);
 
     const refreshFileStructure = () => {
         if (socket) {
@@ -199,7 +227,17 @@ export const CodingPagePostPodCreation = () => {
             </Header>
             <Workspace>
                 <LeftPanel>
-                    {socket && <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} onRefresh={refreshFileStructure} files={fileStructure} />}
+                    {socket && (
+                        <Editor 
+                            socket={socket} 
+                            selectedFile={selectedFile} 
+                            onSelect={onSelect} 
+                            onRefresh={refreshFileStructure} 
+                            files={fileStructure}
+                            projectId={projectId}
+                            userId={userId}
+                        />
+                    )}
                 </LeftPanel>
                 <RightPanel>
                     {socket && <TerminalComponent socket={socket} />}

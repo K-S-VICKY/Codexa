@@ -18,7 +18,14 @@ authRouter.post("/signup", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email, username, passwordHash });
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET || "devsecret", { expiresIn: "7d" });
-    return res.json({ token });
+    return res.json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        username: user.username 
+      } 
+    });
   } catch (e) {
     return res.status(500).json({ message: "Failed to signup" });
   }
@@ -39,7 +46,14 @@ authRouter.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET || "devsecret", { expiresIn: "7d" });
-    return res.json({ token });
+    return res.json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        username: user.username 
+      } 
+    });
   } catch (e) {
     return res.status(500).json({ message: "Failed to login" });
   }

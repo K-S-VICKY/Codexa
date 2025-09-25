@@ -149,7 +149,12 @@ export const Login = () => {
       if (mode === 'signup') body.username = username || email.split('@')[0];
       const res = await axios.post(url, body);
       const token = res.data.token as string;
+      const user = res.data.user;
+      
       window.localStorage.setItem('codexa_jwt', token);
+      if (user) {
+        window.localStorage.setItem('codexa_user', JSON.stringify(user));
+      }
       navigate('/projects');
     } catch (e: any) {
       setError(e?.response?.data?.message || 'Request failed');
