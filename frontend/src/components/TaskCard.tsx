@@ -64,6 +64,17 @@ const PriorityBadge = styled.span<{ priority: TaskPriority }>`
   flex-shrink: 0;
 `;
 
+const DragHandle = styled.div`
+  margin-left: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #3e3e42;
+  display: inline-block;
+  cursor: grab;
+  flex-shrink: 0;
+`;
+
 const TaskDescription = styled.p`
   margin: 0 0 8px 0;
   font-size: 12px;
@@ -135,32 +146,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDelete, com
     id: task.id,
   });
 
-  const formatDeadline = (deadline?: string) => {
-    if (!deadline) return null;
-    
-    const date = new Date(deadline);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) {
-      return `${Math.abs(diffDays)} days overdue`;
-    } else if (diffDays === 0) {
-      return 'Due today';
-    } else if (diffDays === 1) {
-      return 'Due tomorrow';
-    } else if (diffDays <= 7) {
-      return `Due in ${diffDays} days`;
-    } else {
-      return date.toLocaleDateString();
-    }
-  };
-
-  const isOverdue = task.deadline && new Date(task.deadline) < new Date() && task.status !== 'completed';
-  const isUpcoming = task.deadline && !isOverdue && new Date(task.deadline).getTime() - new Date().getTime() <= 7 * 24 * 60 * 60 * 1000;
-
   const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`
   } : undefined;
 
   return (
@@ -170,15 +157,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDelete, com
       onClick={onClick}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
-      {...listeners}
-      {...attributes}
       compact={compact}
     >
-      {isOverdue && <OverdueIndicator />}
+      {task.deadline && new Date(task.deadline) < new Date() && task.status !== 'completed' && <OverdueIndicator />}
       
       <CardHeader>
         <TaskTitle>{task.title}</TaskTitle>
-        <PriorityBadge priority={task.priority}>{task.priority}</PriorityBadge>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <PriorityBadge priority={task.priority}>{task.priority}</PriorityBadge>
+          <DragHandle {...listeners} {...attributes} title="Drag" />
+        </div>
       </CardHeader>
 
       {task.description && (
@@ -187,14 +175,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDelete, com
 
       <TaskFooter>
         {task.deadline && (
-          <Deadline isOverdue={!!isOverdue} isUpcoming={!!isUpcoming}>
-            {formatDeadline(task.deadline)}
+          <Deadline isOverdue={!!(task.deadline && new Date(task.deadline) < new Date() && task.status !== 'completed')} isUpcoming={!!(task.deadline && !(task.deadline && new Date(task.deadline) < new Date()) && new Date(task.deadline).getTime() - new Date().getTime() <= 7 * 24 * 60 * 60 * 1000)}>
+            {(() => {
+              const deadline = task.deadline ? new Date(task.deadline) : undefined;
+              if (!deadline) return null;
+              const now = new Date();
+              const diffTime = deadline.getTime() - now.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`;
+              if (diffDays === 0) return 'Due today';
+              if (diffDays === 1) return 'Due tomorrow';
+              if (diffDays <= 7) return `Due in ${diffDays} days`;
+              return deadline.toLocaleDateString();
+            })()}
           </Deadline>
         )}
         
         <ActionButtons style={{ opacity: showActions ? 1 : 0 }}>
           <ActionButton 
             variant="edit"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               onClick();
@@ -204,6 +204,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDelete, com
           </ActionButton>
           <ActionButton 
             variant="delete"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               if (window.confirm('Are you sure you want to delete this task?')) {
