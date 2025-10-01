@@ -235,7 +235,7 @@ function App() {
         </div>
         <div className="navbar-right">
           <button className="logout-btn">Logout</button>
-        </div>
+      </div>
       </nav>
       <main className="editor-container">
         <div className="editor-square">
@@ -247,7 +247,7 @@ function App() {
             </select>
             <button onClick={runCode} disabled={loading} style={{ padding: '6px 18px', borderRadius: 4, background: '#5e3083', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer' }}>
               {loading ? 'Running...' : 'Run'}
-            </button>
+        </button>
           </div>
           <div className="monaco-editor-wrapper">
             <MonacoEditor
@@ -280,7 +280,7 @@ function App() {
           </div>
         </div>
       )}
-    </div>
+      </div>
   );
 }
 
