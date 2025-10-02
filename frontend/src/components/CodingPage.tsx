@@ -90,7 +90,7 @@ const RightPanel = styled.div`
   flex-direction: column;
 `;
 
-// Pomodoro modal styles
+// Modal styles
 const ModalBackdrop = styled.div`
   position: fixed;
   inset: 0;
@@ -149,322 +149,323 @@ const SmallInput = styled.input`
   width: 80px;
 `;
 
-export const CodingPage = () => {
-    const [podCreated, setPodCreated] = useState(false);
-    const [searchParams] = useSearchParams();
-    const replId = searchParams.get('replId') ?? '';
-    
-    useEffect(() => {
-        if (replId) {
-            axios.post(`http://localhost:3002/start`, { replId })
-                .then(() => setPodCreated(true))
-                .catch((err) => console.error(err));
-        }
-    }, []);
+// Language playlists
+const LANG_PLAYLISTS: Record<string, string> = {
+  telugu: "37i9dQZF1DWTt3gMo0DLxA",
+  tamil: "37i9dQZF1DX4Im4BTs2WMg",
+  english: "78WfVSixcwaxVMetGnA9k0",
+  hindi: "37i9dQZF1DXbVhgADFy3im",
+  marathi: "37i9dQZF1DX84EApEEEkUc",
+  kannada: "37i9dQZF1DX1ahAlaaz0ZE"
+};
 
-    if (!podCreated) {
-        return (
-            <LoadingSpinner 
-                variant="fullscreen" 
-                text="Booting your environment..." 
-                subText="Setting up your containerized development workspace. This may take a few moments."
-            />
-        );
+export const CodingPage = () => {
+  const [podCreated, setPodCreated] = useState(false);
+  const [searchParams] = useSearchParams();
+  const replId = searchParams.get('replId') ?? '';
+  
+  useEffect(() => {
+    if (replId) {
+      axios.post(`http://localhost:3002/start`, { replId })
+        .then(() => setPodCreated(true))
+        .catch((err) => console.error(err));
     }
-    return <CodingPagePostPodCreation />
+  }, []);
+
+  if (!podCreated) {
+    return (
+      <LoadingSpinner 
+        variant="fullscreen" 
+        text="Booting your environment..." 
+        subText="Setting up your containerized development workspace. This may take a few moments."
+      />
+    );
+  }
+  return <CodingPagePostPodCreation />
 }
 
 export const CodingPagePostPodCreation = () => {
-    const [searchParams] = useSearchParams();
-    const replId = searchParams.get('replId') ?? '';
-    const [loaded, setLoaded] = useState(false);
-    const { socket } = useSocket(replId);
-    const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
-    const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-    const [showPortSelector, setShowPortSelector] = useState(false);
-    const [selectedPort, setSelectedPort] = useState<number>(3000);
-    
-    // Get user info from localStorage or context
-    const [userId, setUserId] = useState<string | undefined>(undefined);
-    const [projectId, setProjectId] = useState<string | undefined>(undefined);
+  const [searchParams] = useSearchParams();
+  const replId = searchParams.get('replId') ?? '';
+  const { socket } = useSocket(replId);
 
-    // Pomodoro state
-    const [showPomodoro, setShowPomodoro] = useState(false);
-    const [workMinutes, setWorkMinutes] = useState<number>(25);
-    const [breakMinutes, setBreakMinutes] = useState<number>(5);
-    const [autoCycle, setAutoCycle] = useState<boolean>(false);
-    const [notifyEnabled, setNotifyEnabled] = useState<boolean>(false);
-    const [isRunning, setIsRunning] = useState<boolean>(false);
-    const [isBreak, setIsBreak] = useState<boolean>(false);
-    const [secondsLeft, setSecondsLeft] = useState<number>(workMinutes * 60);
-    const [breakPromptOpen, setBreakPromptOpen] = useState<boolean>(false);
+  const [loaded, setLoaded] = useState(false);
+  const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+  const [showPortSelector, setShowPortSelector] = useState(false);
+  const [selectedPort, setSelectedPort] = useState<number>(3000);
 
-    const ensureNotificationPermission = async () => {
-      if (!('Notification' in window)) return false;
-      if (Notification.permission === 'granted') return true;
-      if (Notification.permission === 'denied') return false;
-      const perm = await Notification.requestPermission();
-      return perm === 'granted';
-    };
-    const notify = (title: string, body: string) => {
-      if (!notifyEnabled) return;
-      if (!('Notification' in window)) return;
-      if (Notification.permission !== 'granted') return;
-      try { new Notification(title, { body }); } catch {}
-    };
-    const beep = () => {
-      try {
-        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sine'; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
-        const t = ctx.currentTime; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t+0.01); g.gain.exponentialRampToValueAtTime(0.0001, t+0.35);
-        o.start(t); o.stop(t+0.4);
-      } catch {}
-    };
+  // Pomodoro state
+  const [showPomodoro, setShowPomodoro] = useState(false);
+  const [workMinutes, setWorkMinutes] = useState<number>(25);
+  const [breakMinutes, setBreakMinutes] = useState<number>(5);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isBreak, setIsBreak] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
+  const [breakPromptOpen, setBreakPromptOpen] = useState(false);
 
-    useEffect(() => {
-        if (socket) {
-            socket.on('loaded', ({ rootContent }: { rootContent: RemoteFile[]}) => {
-                setLoaded(true);
-                setFileStructure(rootContent);
-            });
-        }
-    }, [socket]);
+  // Zen Mode state
+  const [showZen, setShowZen] = useState(false);
+  const [selectedLang, setSelectedLang] = useState<keyof typeof LANG_PLAYLISTS>('english');
+  const [backgroundPlaying, setBackgroundPlaying] = useState(false);
 
-    useEffect(() => {
-        // Get user info from localStorage
-        const token = localStorage.getItem('codexa_jwt');
-        const userInfo = localStorage.getItem('codexa_user');
-        
-        if (token) {
-            if (userInfo) {
-                try {
-                    const user = JSON.parse(userInfo);
-                    setUserId(user.id || user._id || 'mock-user-id');
-                } catch (error) {
-                    console.error('Failed to parse user info:', error);
-                    setUserId('mock-user-id');
-                }
-            } else {
-                // Fallback to mock user ID if user info is not available
-                setUserId('mock-user-id');
-            }
-        }
-        
-        // For now, use replId as projectId - in a real app, you'd fetch the project details
-        setProjectId(replId);
-    }, [replId]);
+  // user/project
+  const [userId, setUserId] = useState<string | undefined>('mock-user-id');
+  const [projectId, setProjectId] = useState<string | undefined>(replId);
 
-    // sync seconds with workMinutes when idle on work sessions
-    useEffect(() => {
-      if (!isRunning && !isBreak) setSecondsLeft(workMinutes * 60);
-    }, [workMinutes, isRunning, isBreak]);
-
-    // countdown
-    useEffect(() => {
-      if (!isRunning) return;
-      const id = setInterval(() => {
-        setSecondsLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(id);
-            setIsRunning(false);
-            beep();
-            if (!isBreak) {
-              // Work finished -> open modal and prompt for break
-              setShowPomodoro(true);
-              setIsBreak(true);
-              setSecondsLeft(Math.max(1, breakMinutes) * 60);
-              setBreakPromptOpen(true);
-              if (notifyEnabled) notify('Time for a break', `Take ${breakMinutes} minutes`);
-              // Wait for user action via prompt buttons
-            } else {
-              // Break finished -> close modal and resume idle work state
-              if (notifyEnabled) notify('Break finished', 'Back to work!');
-              setIsBreak(false);
-              setSecondsLeft(workMinutes * 60);
-              setShowPomodoro(false);
-              // stay paused until user starts again
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(id);
-    }, [isRunning, isBreak, workMinutes, breakMinutes, notifyEnabled]);
-
-    const format = (s: number) => {
-      const m = Math.floor(s / 60).toString().padStart(2, '0');
-      const sec = (s % 60).toString().padStart(2, '0');
-      return `${m}:${sec}`;
-    };
-
-    const startPause = () => setIsRunning(v => !v);
-    const reset = () => { setIsRunning(false); setIsBreak(false); setSecondsLeft(workMinutes * 60); setBreakPromptOpen(false); };
-
-    const openNotifications = async () => {
-      const ok = await ensureNotificationPermission();
-      setNotifyEnabled(ok);
-      if (!ok) {
-        alert('Notifications are blocked by the browser. Please allow notifications for this site.');
-      } else {
-        alert('Desktop notifications enabled.');
-      }
-    };
-
-    const refreshFileStructure = () => {
-        if (socket) {
-            socket.emit("fetchDir", "", (data: RemoteFile[]) => {
-                setFileStructure(data);
-            });
-        }
-    };
-
-    const onSelect = (file: File) => {
-        if (file.type === Type.DIRECTORY) {
-            socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
-                setFileStructure(prev => {
-                    const allFiles = [...prev, ...data];
-                    return allFiles.filter((file, index, self) => 
-                        index === self.findIndex(f => f.path === file.path)
-                    );
-                });
-            });
-        } else {
-            socket?.emit("fetchContent", { path: file.path }, (data: string) => {
-                file.content = data;
-                setSelectedFile(file);
-            });
-        }
-    };
-    
-    if (!loaded) {
-        return (
-            <Container>
-                <Header>
-                    <Logo>Codexa</Logo>
-                    <StatusIndicator connected={false}>
-                        <StatusDot connected={false} />
-                        Connecting...
-                    </StatusIndicator>
-                </Header>
-                <LoadingSpinner 
-                    variant="wave" 
-                    text="Loading workspace..." 
-                    subText="Syncing files and establishing connection"
-                />
-            </Container>
-        );
+  useEffect(() => {
+    if (socket) {
+      socket.on('loaded', ({ rootContent }: { rootContent: RemoteFile[]}) => {
+        setLoaded(true);
+        setFileStructure(rootContent);
+      });
     }
+  }, [socket]);
 
+  // Pomodoro logic
+  useEffect(() => {
+    if (!isRunning && !isBreak) setSecondsLeft(workMinutes * 60);
+  }, [workMinutes, isRunning, isBreak]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = setInterval(() => {
+      setSecondsLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(id);
+          setIsRunning(false);
+          if (!isBreak) {
+            setShowPomodoro(true);
+            setIsBreak(true);
+            setSecondsLeft(Math.max(1, breakMinutes) * 60);
+            setBreakPromptOpen(true);
+          } else {
+            setIsBreak(false);
+            setSecondsLeft(workMinutes * 60);
+            setShowPomodoro(false);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isRunning, isBreak, workMinutes, breakMinutes]);
+
+  const format = (s: number) => {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  };
+
+  const startPause = () => setIsRunning(v => !v);
+  const reset = () => { setIsRunning(false); setIsBreak(false); setSecondsLeft(workMinutes * 60); setBreakPromptOpen(false); };
+
+  const refreshFileStructure = () => {
+    socket?.emit("fetchDir", "", (data: RemoteFile[]) => {
+      setFileStructure(data);
+    });
+  };
+
+  const onSelect = (file: File) => {
+    if (file.type === Type.DIRECTORY) {
+      socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
+        setFileStructure(prev => {
+          const allFiles = [...prev, ...data];
+          return allFiles.filter((f, i, self) => i === self.findIndex(ff => ff.path === f.path));
+        });
+      });
+    } else {
+      socket?.emit("fetchContent", { path: file.path }, (data: string) => {
+        file.content = data;
+        setSelectedFile(file);
+      });
+    }
+  };
+
+  if (!loaded) {
     return (
-        <Container>
-            <Header>
-                <Logo>Codexa</Logo>
-                <ButtonContainer>
-                    <StatusIndicator connected={true}>
-                        <StatusDot connected={true} />
-                        Connected
-                    </StatusIndicator>
-                    <Button 
-                        variant="primary" 
-                        size="sm"
-                        onClick={() => setShowPortSelector(true)}
-                    >
-                        Open Port in New Tab
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setShowPomodoro(true)}
-                    >
-                        Pomodoro
-                    </Button>
-                </ButtonContainer>
-            </Header>
-            <Workspace>
-                <LeftPanel>
-                    {socket && (
-                        <Editor 
-                            socket={socket} 
-                            selectedFile={selectedFile} 
-                            onSelect={onSelect} 
-                            onRefresh={refreshFileStructure} 
-                            files={fileStructure}
-                            projectId={projectId}
-                            userId={userId}
-                        />
-                    )}
-                </LeftPanel>
-                <RightPanel>
-                    {socket && <TerminalComponent socket={socket} />}
-                </RightPanel>
-            </Workspace>
-            <PortSelector
-                isOpen={showPortSelector}
-                onClose={() => setShowPortSelector(false)}
-                onSelectPort={(port) => {
-                    setSelectedPort(port);
-                    // Open port in new tab
-                    const url = `http://${replId}-${port}.vigneshks.tech`;
-                    window.open(url, '_blank');
-                }}
-                currentPort={selectedPort}
-            />
-
-            {showPomodoro && (
-              <ModalBackdrop>
-                <Modal>
-                  <ModalHeader>
-                    <div>Pomodoro</div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(false)}>Close</Button>
-                    </div>
-                  </ModalHeader>
-                  <ModalBody>
-                    {breakPromptOpen && (
-                      <div style={{ background:'#1f2937', border:'1px solid #374151', borderRadius:8, padding:12 }}>
-                        <div style={{ marginBottom:8, fontWeight:700 }}>It's time for a break</div>
-                        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                          <Button variant="primary" size="sm" onClick={() => { setIsRunning(true); /* keep modal open */ }}>Wait till break is over</Button>
-                          <Button variant="secondary" size="sm" onClick={() => {
-                            // skip break and continue work
-                            setIsBreak(false);
-                            setSecondsLeft(workMinutes * 60);
-                            setIsRunning(true);
-                            setBreakPromptOpen(false);
-                            setShowPomodoro(false);
-                          }}>Continue</Button>
-                        </div>
-                      </div>
-                    )}
-                    <Row>
-                      <label>
-                        Work (min)
-                        <SmallInput type="number" min={1} max={120} value={workMinutes}
-                          onChange={e => { setWorkMinutes(Math.max(1, Number(e.target.value) || 25)); if (!isRunning && !isBreak) setSecondsLeft((Math.max(1, Number(e.target.value) || 25)) * 60); }} />
-                      </label>
-                      <label>
-                        Break (min)
-                        <SmallInput type="number" min={1} max={60} value={breakMinutes}
-                          onChange={e => { setBreakMinutes(Math.max(1, Number(e.target.value) || 5)); if (isBreak && !isRunning) setSecondsLeft((Math.max(1, Number(e.target.value) || 5)) * 60); }} />
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <input type="checkbox" checked={autoCycle} onChange={e => setAutoCycle(e.target.checked)} /> Auto-cycle
-                      </label>
-                    </Row>
-                    <Row>
-                      <TimeDisplay>{format(secondsLeft)}{isBreak ? ' (Break)' : ''}</TimeDisplay>
-                    </Row>
-                    <Row>
-                      <Button variant="primary" size="sm" onClick={() => { setBreakPromptOpen(false); startPause(); }}>{isRunning ? 'Pause' : 'Start'}</Button>
-                      <Button variant="secondary" size="sm" onClick={reset}>Reset</Button>
-                    </Row>
-                  </ModalBody>
-                </Modal>
-              </ModalBackdrop>
-            )}
-        </Container>
+      <Container>
+        <Header>
+          <Logo>Codexa</Logo>
+          <StatusIndicator connected={false}>
+            <StatusDot connected={false} />
+            Connecting...
+          </StatusIndicator>
+        </Header>
+        <LoadingSpinner 
+          variant="wave" 
+          text="Loading workspace..." 
+          subText="Syncing files and establishing connection"
+        />
+      </Container>
     );
+  }
+
+  return (
+    <Container>
+      <Header>
+        <Logo>Codexa</Logo>
+        <ButtonContainer>
+          <StatusIndicator connected={true}>
+            <StatusDot connected={true} />
+            Connected
+          </StatusIndicator>
+          <Button variant="primary" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
+          <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
+          <Button variant="secondary" size="sm" onClick={() => setShowZen(true)}>Zen Mode</Button>
+        </ButtonContainer>
+      </Header>
+      <Workspace>
+        <LeftPanel>
+          {socket && (
+            <Editor 
+              socket={socket} 
+              selectedFile={selectedFile} 
+              onSelect={onSelect} 
+              onRefresh={refreshFileStructure} 
+              files={fileStructure}
+              projectId={projectId}
+              userId={userId}
+            />
+          )}
+        </LeftPanel>
+        <RightPanel>
+          {socket && <TerminalComponent socket={socket} />}
+        </RightPanel>
+      </Workspace>
+
+      <PortSelector
+        isOpen={showPortSelector}
+        onClose={() => setShowPortSelector(false)}
+        onSelectPort={(port) => {
+          setSelectedPort(port);
+          const url = `http://${replId}-${port}.vigneshks.tech`;
+          window.open(url, '_blank');
+        }}
+        currentPort={selectedPort}
+      />
+
+      {/* Pomodoro Modal */}
+      {showPomodoro && (
+        <ModalBackdrop>
+          <Modal>
+            <ModalHeader>
+              <div>Pomodoro</div>
+              <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(false)}>Close</Button>
+            </ModalHeader>
+            <ModalBody>
+              {breakPromptOpen && (
+                <div style={{ background:'#1f2937', border:'1px solid #374151', borderRadius:8, padding:12 }}>
+                  <div style={{ marginBottom:8, fontWeight:700 }}>It's time for a break</div>
+                  <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                    <Button variant="primary" size="sm" onClick={() => { setIsRunning(true); }}>Wait till break is over</Button>
+                    <Button variant="secondary" size="sm" onClick={() => {
+                      setIsBreak(false);
+                      setSecondsLeft(workMinutes * 60);
+                      setIsRunning(true);
+                      setBreakPromptOpen(false);
+                      setShowPomodoro(false);
+                    }}>Continue</Button>
+                  </div>
+                </div>
+              )}
+              <Row>
+                <label>
+                  Work (min)
+                  <SmallInput type="number" value={workMinutes}
+                    onChange={e => { setWorkMinutes(Math.max(1, Number(e.target.value) || 25)); if (!isRunning && !isBreak) setSecondsLeft((Math.max(1, Number(e.target.value) || 25)) * 60); }} />
+                </label>
+                <label>
+                  Break (min)
+                  <SmallInput type="number" value={breakMinutes}
+                    onChange={e => { setBreakMinutes(Math.max(1, Number(e.target.value) || 5)); if (isBreak && !isRunning) setSecondsLeft((Math.max(1, Number(e.target.value) || 5)) * 60); }} />
+                </label>
+              </Row>
+              <Row>
+                <TimeDisplay>{format(secondsLeft)}{isBreak ? ' (Break)' : ''}</TimeDisplay>
+              </Row>
+              <Row>
+                <Button variant="primary" size="sm" onClick={() => { setBreakPromptOpen(false); startPause(); }}>{isRunning ? 'Pause' : 'Start'}</Button>
+                <Button variant="secondary" size="sm" onClick={reset}>Reset</Button>
+              </Row>
+            </ModalBody>
+          </Modal>
+        </ModalBackdrop>
+      )}
+
+      {/* Zen Mode Modal */}
+      {showZen && (
+        <ModalBackdrop>
+          <Modal>
+            <ModalHeader>
+              <div>Zen Mode (Spotify)</div>
+              <Button variant="secondary" size="sm" onClick={() => setShowZen(false)}>Close</Button>
+            </ModalHeader>
+            <ModalBody>
+              <div style={{ marginBottom:12, fontWeight:700 }}>Choose Language Playlist 🎶</div>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:12 }}>
+                {Object.keys(LANG_PLAYLISTS).map(lang => {
+                  const active = lang===selectedLang;
+                  return (
+                    <button 
+                      key={lang} 
+                      onClick={()=>setSelectedLang(lang as keyof typeof LANG_PLAYLISTS)} 
+                      style={{
+                        padding:'6px 12px',
+                        borderRadius:20,
+                        border: active?'2px solid #22d3ee':'1px solid #374151',
+                        background: active?'rgba(34,211,238,0.2)':'#1f2937',
+                        color:'#e2e8f0',
+                        cursor:'pointer',
+                        fontWeight:700,
+                        textTransform:'capitalize'
+                      }}
+                    >
+                      {lang}
+                    </button>
+                  )
+                })}
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                <Button 
+                  variant="primary" 
+                  size="sm" 
+                  onClick={() => {
+                    setBackgroundPlaying(true);
+                    setShowZen(false); // hide modal when play clicked
+                  }}
+                >
+                  Play
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => setBackgroundPlaying(false)}
+                >
+                  Pause
+                </Button>
+              </div>
+            </ModalBody>
+          </Modal>
+        </ModalBackdrop>
+      )}
+
+      {/* Spotify player only shows when Play is clicked */}
+      {backgroundPlaying && (
+        <div style={{ position:'fixed', bottom:12, right:12, width:320, height:80, zIndex:900 }}>
+          <iframe
+            title="spotify-player"
+            style={{ borderRadius: 8 }}
+            src={`https://open.spotify.com/embed/playlist/${LANG_PLAYLISTS[selectedLang]}?utm_source=generator&theme=0`}
+            width="100%"
+            height="80"
+            frameBorder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+          />
+        </div>
+      )}
+    </Container>
+  );
 }
