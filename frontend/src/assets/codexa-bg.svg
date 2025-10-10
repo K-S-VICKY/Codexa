@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Grid pattern -->
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#6366f1" stroke-width="0.5" opacity="0.08"/>
+    </pattern>
+    
+    <!-- Radial gradients for glow effects -->
+    <radialGradient id="glow1" cx="20%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.2"/>
+      <stop offset="70%" stop-color="#6366f1" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    
+    <radialGradient id="glow2" cx="80%" cy="70%" r="35%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+      <stop offset="70%" stop-color="#8b5cf6" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    
+    <radialGradient id="glow3" cx="50%" cy="20%" r="30%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.1"/>
+      <stop offset="70%" stop-color="#06b6d4" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Circuit pattern -->
+    <pattern id="circuit" width="200" height="200" patternUnits="userSpaceOnUse">
+      <g opacity="0.03">
+        <path d="M20,20 L180,20 L180,180 L20,180 Z" fill="none" stroke="#6366f1" stroke-width="1"/>
+        <circle cx="50" cy="50" r="3" fill="#8b5cf6"/>
+        <circle cx="150" cy="50" r="3" fill="#06b6d4"/>
+        <circle cx="50" cy="150" r="3" fill="#6366f1"/>
+        <circle cx="150" cy="150" r="3" fill="#8b5cf6"/>
+        <path d="M50,50 L150,50 M50,150 L150,150 M50,50 L50,150 M150,50 L150,150" stroke="#6366f1" stroke-width="0.5"/>
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Base background -->
+  <rect width="100%" height="100%" fill="#0f0f23"/>
+  
+  <!-- Grid overlay -->
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  
+  <!-- Circuit pattern -->
+  <rect width="100%" height="100%" fill="url(#circuit)"/>
+  
+  <!-- Glow effects -->
+  <rect width="100%" height="100%" fill="url(#glow1)"/>
+  <rect width="100%" height="100%" fill="url(#glow2)"/>
+  <rect width="100%" height="100%" fill="url(#glow3)"/>
+  
+  <!-- Floating code elements -->
+  <g opacity="0.04" font-family="monospace">
+    <text x="100" y="150" font-size="16" fill="#6366f1">&lt;div&gt;</text>
+    <text x="200" y="200" font-size="14" fill="#8b5cf6">function()</text>
+    <text x="300" y="250" font-size="16" fill="#6366f1">{</text>
+    <text x="400" y="300" font-size="14" fill="#8b5cf6">return</text>
+    <text x="500" y="350" font-size="16" fill="#6366f1">}</text>
+    <text x="600" y="400" font-size="14" fill="#8b5cf6">&lt;/div&gt;</text>
+    
+    <text x="150" y="500" font-size="12" fill="#06b6d4">import React</text>
+    <text x="250" y="550" font-size="12" fill="#6366f1">from 'react'</text>
+    <text x="350" y="600" font-size="12" fill="#8b5cf6">;</text>
+    
+    <text x="800" y="200" font-size="14" fill="#6366f1">const</text>
+    <text x="900" y="250" font-size="12" fill="#8b5cf6">useState</text>
+    <text x="1000" y="300" font-size="14" fill="#6366f1">=</text>
+    <text x="1100" y="350" font-size="12" fill="#06b6d4">React.useState</text>
+    
+    <text x="1200" y="500" font-size="14" fill="#6366f1">export</text>
+    <text x="1300" y="550" font-size="12" fill="#8b5cf6">default</text>
+    <text x="1400" y="600" font-size="14" fill="#6366f1">App</text>
+    
+    <text x="200" y="800" font-size="12" fill="#06b6d4">async</text>
+    <text x="300" y="850" font-size="12" fill="#6366f1">await</text>
+    <text x="400" y="900" font-size="12" fill="#8b5cf6">fetch</text>
+    
+    <text x="1000" y="800" font-size="14" fill="#6366f1">useEffect</text>
+    <text x="1100" y="850" font-size="12" fill="#8b5cf6">(()</text>
+    <text x="1200" y="900" font-size="14" fill="#6366f1">=&gt;</text>
+    <text x="1300" y="950" font-size="12" fill="#06b6d4">{}</text>
+  </g>
+  
+  <!-- Binary code pattern -->
+  <g opacity="0.02" font-family="monospace" font-size="10" fill="#6366f1">
+    <text x="50" y="100">01001000</text>
+    <text x="150" y="120">01100101</text>
+    <text x="250" y="140">01101100</text>
+    <text x="350" y="160">01101100</text>
+    <text x="450" y="180">01101111</text>
+    
+    <text x="1600" y="200">01000011</text>
+    <text x="1700" y="220">01101111</text>
+    <text x="1800" y="240">01100100</text>
+    <text x="50" y="260">01100101</text>
+    <text x="150" y="280">01111000</text>
+    <text x="250" y="300">01100001</text>
+  </g>
+</svg>
