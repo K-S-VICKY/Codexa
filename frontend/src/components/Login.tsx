@@ -4,13 +4,19 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Input } from './Input';
 import { Button } from './Button';
+import codexaBg from '../assets/codexa-bg.svg';
 
 const Container = styled.div`
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  background: 
+    linear-gradient(135deg, rgba(15, 15, 35, 0.85) 0%, rgba(26, 26, 46, 0.85) 50%, rgba(22, 33, 62, 0.85) 100%),
+    url(${codexaBg});
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -26,34 +32,79 @@ const BackgroundOrbs = styled.div`
   overflow: hidden;
 `;
 
+const FloatingCode = styled.div<{ x: number; y: number; delay: number; size: number }>`
+  position: absolute;
+  left: ${props => props.x}%;
+  top: ${props => props.y}%;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: ${props => props.size}px;
+  color: rgba(99, 102, 241, 0.1);
+  animation: float ${props => 8 + props.delay}s ease-in-out infinite;
+  animation-delay: ${props => props.delay}s;
+  user-select: none;
+  
+  @keyframes float {
+    0%, 100% { 
+      opacity: 0.1; 
+      transform: translateY(0px) rotate(0deg); 
+    }
+    50% { 
+      opacity: 0.05; 
+      transform: translateY(-20px) rotate(5deg); 
+    }
+  }
+`;
+
 const Orb = styled.div<{ size: number; x: number; y: number; delay: number }>`
   position: absolute;
   width: ${props => props.size}px;
   height: ${props => props.size}px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
   border-radius: 50%;
   left: ${props => props.x}%;
   top: ${props => props.y}%;
-  animation: pulse ${props => 3 + props.delay}s ease-in-out infinite;
+  animation: pulse ${props => 4 + props.delay}s ease-in-out infinite;
   animation-delay: ${props => props.delay}s;
+  filter: blur(1px);
   
   @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.1); }
+    0%, 100% { 
+      opacity: 0.8; 
+      transform: scale(1) translateY(0px); 
+    }
+    50% { 
+      opacity: 0.4; 
+      transform: scale(1.2) translateY(-10px); 
+    }
   }
 `;
 
 const LoginCard = styled.div`
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
   border-radius: 24px;
   padding: 48px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   position: relative;
   z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-radius: 24px;
+    z-index: -1;
+  }
 `;
 
 const Header = styled.div`
@@ -170,6 +221,15 @@ export const Login = () => {
         <Orb size={150} x={80} y={10} delay={1} />
         <Orb size={180} x={70} y={70} delay={2} />
         <Orb size={120} x={20} y={80} delay={1.5} />
+        
+        <FloatingCode x={15} y={25} delay={0} size={12}>const</FloatingCode>
+        <FloatingCode x={85} y={15} delay={1} size={10}>function</FloatingCode>
+        <FloatingCode x={75} y={75} delay={2} size={14}>return</FloatingCode>
+        <FloatingCode x={25} y={85} delay={1.5} size={11}>import</FloatingCode>
+        <FloatingCode x={50} y={10} delay={0.5} size={9}>export</FloatingCode>
+        <FloatingCode x={90} y={60} delay={2.5} size={13}>async</FloatingCode>
+        <FloatingCode x={5} y={60} delay={1.8} size={10}>await</FloatingCode>
+        <FloatingCode x={60} y={90} delay={3} size={12}>useState</FloatingCode>
       </BackgroundOrbs>
       
       <LoginCard>

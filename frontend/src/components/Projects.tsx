@@ -5,10 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from './Input';
 import { Button } from './Button';
 import { LoadingSpinner } from './LoadingSpinner';
+import codexaBg from '../assets/codexa-bg.svg';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  background: 
+    linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(26, 26, 46, 0.9) 50%, rgba(22, 33, 62, 0.9) 100%),
+    url(${codexaBg});
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 24px;
 `;
 

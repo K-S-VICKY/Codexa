@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Editor } from './Editor';
 import { File, RemoteFile, Type } from './external/editor/utils/file-manager';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { TerminalComponent } from './Terminal';
 import { PortSelector } from './PortSelector';
 import { useSocket } from '../hooks/useSocket';
 import { Button } from './Button';
 import { LoadingSpinner } from './LoadingSpinner';
+import { FiLogOut } from 'react-icons/fi';
 import axios from 'axios';
 
 const Container = styled.div`
@@ -186,6 +187,7 @@ export const CodingPage = () => {
 
 export const CodingPagePostPodCreation = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const replId = searchParams.get('replId') ?? '';
   const { socket } = useSocket(replId);
 
@@ -209,9 +211,26 @@ export const CodingPagePostPodCreation = () => {
   const [selectedLang, setSelectedLang] = useState<keyof typeof LANG_PLAYLISTS>('english');
   const [backgroundPlaying, setBackgroundPlaying] = useState(false);
 
+  // Logout confirmation state
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   // user/project
   const [userId, setUserId] = useState<string | undefined>('mock-user-id');
   const [projectId, setProjectId] = useState<string | undefined>(replId);
+
+  // Logout function
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem('codexa_jwt');
+    localStorage.removeItem('codexa_user');
+    
+    // Navigate to login page
+    navigate('/login');
+  };
 
   useEffect(() => {
     if (socket) {
@@ -314,6 +333,10 @@ export const CodingPagePostPodCreation = () => {
           <Button variant="primary" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
           <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
           <Button variant="secondary" size="sm" onClick={() => setShowZen(true)}>Zen Mode</Button>
+          <Button variant="secondary" size="sm" onClick={handleLogout}>
+            <FiLogOut style={{ marginRight: '6px' }} />
+            Logout
+          </Button>
         </ButtonContainer>
       </Header>
       <Workspace>
@@ -444,6 +467,31 @@ export const CodingPagePostPodCreation = () => {
                   onClick={() => setBackgroundPlaying(false)}
                 >
                   Pause
+                </Button>
+              </div>
+            </ModalBody>
+          </Modal>
+        </ModalBackdrop>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <ModalBackdrop>
+          <Modal>
+            <ModalHeader>
+              <div>Confirm Logout</div>
+              <Button variant="secondary" size="sm" onClick={() => setShowLogoutConfirm(false)}>×</Button>
+            </ModalHeader>
+            <ModalBody>
+              <div style={{ marginBottom: 16, color: '#e2e8f0' }}>
+                Are you sure you want to logout? Any unsaved work will be lost.
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                <Button variant="secondary" size="sm" onClick={() => setShowLogoutConfirm(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" size="sm" onClick={confirmLogout}>
+                  Logout
                 </Button>
               </div>
             </ModalBody>
