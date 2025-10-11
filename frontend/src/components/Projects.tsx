@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from './Input';
 import { Button } from './Button';
 import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingOverlay } from './LoadingOverlay';
 import codexaBg from '../assets/codexa-bg.svg';
 
 const Container = styled.div`
@@ -253,6 +254,10 @@ export const Projects = () => {
 
   return (
     <Container>
+      <LoadingOverlay 
+        open={!!startingProject}
+        message="Lab provisioned. Getting ready…"
+      />
       <Header>
         <Title>Your Projects</Title>
         <Subtitle>Manage and access your development environments</Subtitle>
