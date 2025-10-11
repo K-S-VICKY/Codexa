@@ -8,6 +8,7 @@ import { PortSelector } from './PortSelector';
 import { useSocket } from '../hooks/useSocket';
 import { Button } from './Button';
 import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingOverlay } from './LoadingOverlay';
 import { FiLogOut } from 'react-icons/fi';
 import axios from 'axios';
 
@@ -175,11 +176,7 @@ export const CodingPage = () => {
 
   if (!podCreated) {
     return (
-      <LoadingSpinner 
-        variant="fullscreen" 
-        text="Booting your environment..." 
-        subText="Setting up your containerized development workspace. This may take a few moments."
-      />
+      <LoadingOverlay open={true} message="Booting your environment…" />
     );
   }
   return <CodingPagePostPodCreation />
