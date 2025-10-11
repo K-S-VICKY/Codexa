@@ -161,6 +161,30 @@ const LANG_PLAYLISTS: Record<string, string> = {
   kannada: "37i9dQZF1DX1ahAlaaz0ZE"
 };
 
+// Fullscreen helper
+const enterFullscreen = async () => {
+  try {
+    const el: any = document.documentElement;
+    if (document.fullscreenElement) return;
+    if (el.requestFullscreen) {
+      await el.requestFullscreen();
+      return;
+    }
+    if (el.webkitRequestFullscreen) {
+      await el.webkitRequestFullscreen();
+      return;
+    }
+    if (el.mozRequestFullScreen) {
+      await el.mozRequestFullScreen();
+      return;
+    }
+    if (el.msRequestFullscreen) {
+      await el.msRequestFullscreen();
+      return;
+    }
+  } catch {}
+};
+
 export const CodingPage = () => {
   const [podCreated, setPodCreated] = useState(false);
   const [searchParams] = useSearchParams();
@@ -329,7 +353,7 @@ export const CodingPagePostPodCreation = () => {
           </StatusIndicator>
           <Button variant="primary" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
           <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
-          <Button variant="secondary" size="sm" onClick={() => setShowZen(true)}>Zen Mode</Button>
+          <Button variant="secondary" size="sm" onClick={async () => { await enterFullscreen(); setShowZen(true); }}>Zen Mode</Button>
           <Button variant="secondary" size="sm" onClick={handleLogout}>
             <FiLogOut style={{ marginRight: '6px' }} />
             Logout
@@ -499,6 +523,25 @@ export const CodingPagePostPodCreation = () => {
       {/* Spotify player only shows when Play is clicked */}
       {backgroundPlaying && (
         <div style={{ position:'fixed', bottom:12, right:12, width:320, height:80, zIndex:900 }}>
+          <button
+            aria-label="Close Spotify player"
+            onClick={() => setBackgroundPlaying(false)}
+            style={{
+              position:'absolute',
+              top:-10,
+              right:-10,
+              width:28,
+              height:28,
+              borderRadius:16,
+              background:'#111827',
+              color:'#e2e8f0',
+              border:'1px solid #374151',
+              cursor:'pointer',
+              boxShadow:'0 2px 6px rgba(0,0,0,0.25)'
+            }}
+          >
+            ×
+          </button>
           <iframe
             title="spotify-player"
             style={{ borderRadius: 8 }}
