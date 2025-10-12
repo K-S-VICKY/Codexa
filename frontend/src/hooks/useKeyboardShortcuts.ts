@@ -4,7 +4,7 @@ interface KeyboardShortcutsConfig {
   onAddTask: () => void;
   onRefresh: () => void;
 }
-
+//done
 export const useKeyboardShortcuts = ({ onAddTask, onRefresh }: KeyboardShortcutsConfig) => {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // Only trigger shortcuts when not typing in input fields
