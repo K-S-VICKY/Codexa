@@ -206,7 +206,7 @@ export const CodingPage = () => {
 
   if (!podCreated) {
     return (
-      <LoadingOverlay open={true} message="Booting your environment…" />
+      <LoadingOverlay open={true} message="Booting your environment…" minDurationMs={3500} />
     );
   }
   return <CodingPagePostPodCreation />
@@ -324,6 +324,8 @@ export const CodingPagePostPodCreation = () => {
     // Clear authentication data
     localStorage.removeItem('codexa_jwt');
     localStorage.removeItem('codexa_user');
+    // Reset session-specific UI state (quote shown on loading overlay)
+    try { sessionStorage.removeItem('codexa_quote_index'); } catch {}
     
     // Navigate to login page
     navigate('/login');

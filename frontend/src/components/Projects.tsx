@@ -257,6 +257,7 @@ export const Projects = () => {
       <LoadingOverlay 
         open={!!startingProject}
         message="Lab provisioned. Getting ready…"
+        minDurationMs={3500}
       />
       <Header>
         <Title>Your Projects</Title>

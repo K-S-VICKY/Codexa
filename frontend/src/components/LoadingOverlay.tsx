@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import { QUOTES, getRandomQuoteIndex } from '../assets/quotes';
@@ -132,14 +132,51 @@ export interface LoadingOverlayProps {
   open: boolean;
   message?: string;
   rotateMs?: number;
+  minDurationMs?: number;
 }
 
-export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ open, message = 'Lab provisioned. Getting ready…', rotateMs: _rotateMs = 3500 }) => {
-  const [index] = useState(() => getRandomQuoteIndex(QUOTES.length));
+export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ open, message = 'Lab provisioned. Getting ready…', rotateMs: _rotateMs = 3500, minDurationMs = 2500 }) => {
+  const [index] = useState(() => {
+    try {
+      const key = 'codexa_quote_index';
+      const existing = sessionStorage.getItem(key);
+      if (existing !== null) {
+        const n = parseInt(existing, 10);
+        if (!Number.isNaN(n) && n >= 0 && n < QUOTES.length) return n;
+      }
+      const idx = getRandomQuoteIndex(QUOTES.length);
+      sessionStorage.setItem(key, String(idx));
+      return idx;
+    } catch {
+      return getRandomQuoteIndex(QUOTES.length);
+    }
+  });
   const quote = useMemo(() => QUOTES[index], [index]);
 
+  // Enforce a minimum display time for the overlay
+  const [visible, setVisible] = useState<boolean>(open);
+  const shownAtRef = useRef<number | null>(open ? Date.now() : null);
+
+  useEffect(() => {
+    if (open) {
+      shownAtRef.current = Date.now();
+      setVisible(true);
+      return;
+    }
+    // If closing, ensure min duration has passed
+    const started = shownAtRef.current ?? Date.now();
+    const elapsed = Date.now() - started;
+    const remaining = Math.max(0, minDurationMs - elapsed);
+    if (remaining === 0) {
+      setVisible(false);
+    } else {
+      const t = setTimeout(() => setVisible(false), remaining);
+      return () => clearTimeout(t);
+    }
+  }, [open, minDurationMs]);
+
   return (
-    <Overlay role="status" aria-live="polite" visible={open}>
+    <Overlay role="status" aria-live="polite" visible={visible}>
       <Wrap>
         <Loader>
           <Ring />
