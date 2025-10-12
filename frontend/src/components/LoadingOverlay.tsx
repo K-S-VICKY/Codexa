@@ -96,19 +96,36 @@ const Subtext = styled.div`
 
 const QuoteWrap = styled.div`
   animation: ${fadeIn} 400ms ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 const QuoteText = styled.blockquote`
-  margin: 0 0 12px 0;
-  color: #cbd5e1;
-  font-size: 26px;
+  position: relative;
+  margin: 0 0 16px 0;
+  color: #94a3b8;
+  font-size: 36px;
   font-style: italic;
-  line-height: 1.5;
+  font-weight: 500;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+
+  &::before {
+    display: block;
+    color: #cbd5e1;
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0.85;
+  }
 `;
 
 const QuoteAuthor = styled.div`
-  color: #94a3b8;
-  font-size: 16px;
+  color: #9ca3af;
+  font-size: 14px;
+  margin-left: 2px;
 `;
 
 export interface LoadingOverlayProps {
