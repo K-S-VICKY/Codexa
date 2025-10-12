@@ -10,21 +10,21 @@ import { useSearchParams } from "react-router-dom";
 
 // credits - https://codesandbox.io/s/monaco-tree-pec7u
 export const Editor = ({
-    files,
-    onSelect,
-    selectedFile,
-    socket,
-    onRefresh,
-    projectId,
-    userId
+  files,
+  onSelect,
+  selectedFile,
+  socket,
+  onRefresh,
+  projectId,
+  userId
 }: {
-    files: RemoteFile[];
-    onSelect: (file: File) => void;
-    selectedFile: File | undefined;
-    socket: Socket;
-    onRefresh?: () => void;
-    projectId?: string;
-    userId?: string;
+  files: RemoteFile[];
+  onSelect: (file: File) => void;
+  selectedFile: File | undefined;
+  socket: Socket;
+  onRefresh?: () => void;
+  projectId?: string;
+  userId?: string;
 }) => {
   const rootDir = useMemo(() => {
     return buildFileTree(files);
@@ -74,7 +74,7 @@ export const Editor = ({
   };
 
   return (
-    <div>
+    <EditorContainer>
       <Main>
         <EnhancedSidebar
           onNewFile={handleNewFile}
@@ -109,10 +109,20 @@ export const Editor = ({
         onConfirm={handleCreateFolder}
         onCancel={() => setShowNewFolderDialog(false)}
       />
-    </div>
+    </EditorContainer>
   );
 };
 
+const EditorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+`;
+
 const Main = styled.main`
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
 `;

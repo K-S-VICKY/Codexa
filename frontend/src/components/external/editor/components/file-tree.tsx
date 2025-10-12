@@ -311,12 +311,12 @@ const Div = styled.div<{
   display: flex;
   align-items: center;
   padding-left: ${props => props.depth * 16}px;
-  background-color: ${props => props.isSelected ? "#242424" : props.isDragOver ? "#333" : "transparent"};
-  color: #ffffff;
+  background-color: ${props => props.isSelected ? "#e5e7eb" : props.isDragOver ? "#333" : "transparent"};
+  color: ${props => props.isSelected ? "#111827" : "#ffffff"};
 
   :hover {
     cursor: pointer;
-    background-color: #242424;
+    background-color: ${props => props.isSelected ? "#cbd5e1" : "#242424"};
   }
 `
 

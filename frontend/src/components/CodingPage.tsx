@@ -78,20 +78,23 @@ const Workspace = styled.div`
 `;
 
 const LeftPanel = styled.div`
-  flex: 1;
-  width: 60%;
-  background: rgba(15, 23, 42, 0.4);
+  flex: 2;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: transparent;
   border-right: 1px solid rgba(148, 163, 184, 0.1);
 `;
 
 const RightPanel = styled.div`
   flex: 1;
-  width: 40%;
-  background: rgba(15, 23, 42, 0.2);
+  width: 30%;
+  background: transparent;
   display: flex;
   flex-direction: column;
-  /* critical for flex children to be scrollable instead of growing */
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
 `;
 
@@ -606,7 +609,15 @@ export const CodingPagePostPodCreation = () => {
                       variant="gradientOutline"
                       size="sm"
                       onClick={()=>setSelectedLang(lang as keyof typeof LANG_PLAYLISTS)}
-                      style={{ textTransform:'capitalize', fontWeight:700, opacity: active? 1 : 0.9 }}
+                      style={{
+                        textTransform:'capitalize',
+                        fontWeight:700,
+                        opacity: active ? 1 : 0.9,
+                        background: active ? 'linear-gradient(rgba(59,130,246,0.15), rgba(139,92,246,0.15))' : undefined,
+                        borderColor: active ? '#3b82f6' : undefined,
+                        boxShadow: active ? 'inset 0 0 0 2px rgba(59,130,246,0.25)' : undefined
+                      }}
+                      aria-pressed={active}
                     >
                       {lang}
                     </Button>
