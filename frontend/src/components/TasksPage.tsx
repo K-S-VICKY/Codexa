@@ -5,7 +5,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #dbeafe 100%);
   display: flex;
   flex-direction: column;
 `;
@@ -16,16 +16,16 @@ const Header = styled.div`
   align-items: flex-start;
   gap: 8px;
   padding: 16px 24px;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
 const Logo = styled.div`
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -63,10 +63,11 @@ const TaskManagerContainer = styled.div`
   width: 100%;
   max-width: 1200px;
   height: calc(100vh - 120px);
-  background: #1e1e1e;
+  background: #ffffff;
   border-radius: 8px;
-  border: 1px solid #3e3e42;
+  border: 1px solid #e2e8f0;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
 const LoadingContainer = styled.div`
@@ -75,7 +76,7 @@ const LoadingContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  color: #ffffff;
+  color: #1e293b;
   text-align: center;
 `;
 
@@ -87,7 +88,7 @@ const LoadingText = styled.h2`
 
 const LoadingSubtext = styled.p`
   margin: 0;
-  color: #888;
+  color: #64748b;
   font-size: 16px;
 `;
 

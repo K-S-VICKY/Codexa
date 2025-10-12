@@ -16,24 +16,24 @@ const Container = styled.div`
 const StyledInput = styled.input<{ hasValue: boolean; hasError: boolean }>`
   width: 100%;
   padding: 16px 16px 8px 16px;
-  border: 2px solid ${props => props.hasError ? '#ef4444' : 'rgba(148, 163, 184, 0.2)'};
+  border: 2px solid ${props => props.hasError ? props.theme.colors.error : '#3A3A3F'};
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(10px);
-  color: #e2e8f0;
+  background: ${props => props.theme.colors.inputBg};
+  color: ${props => props.theme.colors.textPrimary};
   font-size: 16px;
   font-family: inherit;
   outline: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:focus {
-    border-color: ${props => props.hasError ? '#ef4444' : '#6366f1'};
+    border-color: ${props => props.hasError ? props.theme.colors.error : props.theme.colors.accent};
     animation: ${focusGlow} 0.6s ease-out;
-    background: rgba(15, 23, 42, 0.8);
+    background: ${props => props.theme.colors.inputBg};
+    box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.2);
   }
   
   &:hover:not(:focus) {
-    border-color: ${props => props.hasError ? '#ef4444' : 'rgba(148, 163, 184, 0.4)'};
+    border-color: ${props => props.hasError ? props.theme.colors.error : '#4A4A50'};
   }
   
   &::placeholder {
@@ -43,8 +43,8 @@ const StyledInput = styled.input<{ hasValue: boolean; hasError: boolean }>`
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.8) inset;
-    -webkit-text-fill-color: #e2e8f0;
+    -webkit-box-shadow: 0 0 0 1000px ${props => props.theme.colors.inputBg} inset;
+    -webkit-text-fill-color: ${props => props.theme.colors.textPrimary};
     transition: background-color 5000s ease-in-out 0s;
   }
 `;
@@ -55,23 +55,21 @@ const Label = styled.label<{ isFocused: boolean; hasValue: boolean; hasError: bo
   top: ${props => (props.isFocused || props.hasValue) ? '8px' : '16px'};
   font-size: ${props => (props.isFocused || props.hasValue) ? '12px' : '16px'};
   color: ${props => {
-    if (props.hasError) return '#ef4444';
-    if (props.isFocused) return '#6366f1';
-    return '#94a3b8';
+    if (props.hasError) return props.theme.colors.error;
+    if (props.isFocused) return props.theme.colors.accent;
+    return props.theme.colors.textSecondary;
   }};
   font-weight: ${props => (props.isFocused || props.hasValue) ? '500' : '400'};
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left top;
-  background: ${props => (props.isFocused || props.hasValue) ? 
-    'linear-gradient(to right, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%)' : 
-    'transparent'};
-  padding: ${props => (props.isFocused || props.hasValue) ? '0 4px' : '0'};
-  margin-left: ${props => (props.isFocused || props.hasValue) ? '-4px' : '0'};
+  background: transparent;
+  padding: 0;
+  margin-left: 0;
 `;
 
 const ErrorMessage = styled.div`
-  color: #ef4444;
+  color: ${props => props.theme.colors.error};
   font-size: 14px;
   margin-top: 6px;
   margin-left: 4px;
@@ -86,7 +84,7 @@ const ErrorMessage = styled.div`
 `;
 
 const HelperText = styled.div`
-  color: #64748b;
+  color: ${props => props.theme.colors.textSecondary};
   font-size: 14px;
   margin-top: 6px;
   margin-left: 4px;
@@ -97,7 +95,7 @@ const IconContainer = styled.div`
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: ${props => props.theme.colors.textSecondary};
   pointer-events: none;
   transition: color 0.2s ease;
 `;

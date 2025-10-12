@@ -17,32 +17,77 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  color: white;
+  color: #1e293b;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
 `;
 
 const StyledInput = styled.input`
   margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 16px;
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  &::placeholder {
+    color: #94a3b8;
+  }
 `;
 
 const StyledSelect = styled.select`
   margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 16px;
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  option {
+    background: #ffffff;
+    color: #1e293b;
+  }
 `;
 
 const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.4);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 

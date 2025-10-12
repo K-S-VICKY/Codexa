@@ -19,28 +19,25 @@ const Overlay = styled.div`
 `;
 
 const Modal = styled.div`
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  background: #F3F4F6;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E5E7EB;
   min-width: 400px;
   max-width: 500px;
+  color: #1E293B;
 `;
 
 const Title = styled.h2`
-  color: #f1f5f9;
+  color: #1E293B;
   font-size: 24px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 `;
 
 const Subtitle = styled.p`
-  color: #94a3b8;
+  color: #64748B;
   font-size: 14px;
   margin: 0 0 24px 0;
   line-height: 1.5;
@@ -60,13 +57,13 @@ const PortRow = styled.div`
 `;
 
 const PortButton = styled.button<{ selected: boolean }>`
-  background: ${props => props.selected 
-    ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' 
-    : 'rgba(51, 65, 85, 0.6)'};
-  border: 1px solid ${props => props.selected ? '#6366f1' : 'rgba(148, 163, 184, 0.2)'};
+  background: ${props => props.selected
+    ? 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #3b82f6, #8b5cf6) border-box'
+    : '#FFFFFF'};
+  border: ${props => props.selected ? '2px solid transparent' : '1px solid #D1D5DB'};
   border-radius: 12px;
   padding: 16px 12px;
-  color: ${props => props.selected ? '#ffffff' : '#e2e8f0'};
+  color: #000000;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -79,11 +76,11 @@ const PortButton = styled.button<{ selected: boolean }>`
   flex: 1;
 
   &:hover {
-    background: ${props => props.selected 
-      ? 'linear-gradient(135deg, #5b5bf6 0%, #7c3aed 100%)' 
-      : 'rgba(51, 65, 85, 0.8)'};
-    border-color: ${props => props.selected ? '#5b5bf6' : '#6366f1'};
     transform: translateY(-2px);
+    background: ${props => props.selected
+      ? 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #0090FF, #7c3aed) border-box'
+      : '#FFFFFF'};
+    border-color: ${props => props.selected ? 'transparent' : '#9CA3AF'};
   }
 
   &:active {
@@ -237,10 +234,10 @@ export const PortSelector: React.FC<PortSelectorProps> = ({
         </PortGrid>
 
         <ButtonRow>
-          <Button variant="secondary" size="sm" onClick={onClose}>
+          <Button variant="gradientOutline" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" size="sm" onClick={handleConfirm}>
+          <Button variant="gradientOutline" size="sm" onClick={handleConfirm}>
             Open Port {selectedPort} in New Tab
           </Button>
         </ButtonRow>

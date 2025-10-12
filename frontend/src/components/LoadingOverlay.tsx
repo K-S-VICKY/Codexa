@@ -21,14 +21,14 @@ const pulse = keyframes`
 const Overlay = styled.div<{ visible: boolean }>`
   position: fixed;
   inset: 0;
-  background: radial-gradient(1200px 600px at 30% 20%, rgba(32, 45, 80, 0.35), transparent 40%),
-    radial-gradient(900px 500px at 75% 75%, rgba(62, 28, 120, 0.3), transparent 40%),
-    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #0f172a 100%);
+  background: radial-gradient(1200px 600px at 30% 20%, rgba(59, 130, 246, 0.1), transparent 40%),
+    radial-gradient(900px 500px at 75% 75%, rgba(37, 99, 235, 0.08), transparent 40%),
+    linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #dbeafe 100%);
   display: ${p => (p.visible ? 'flex' : 'none')};
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  color: #e2e8f0;
+  color: #1e293b;
 `;
 
 const Wrap = styled.div`
@@ -83,14 +83,14 @@ const CenterText = styled.div`
 const LoadingWord = styled.div`
   font-size: 56px;
   letter-spacing: 1px;
-  color: #7dd3fc;
-  text-shadow: 0 0 12px rgba(125, 211, 252, 0.35);
+  color: #3b82f6;
+  text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
   animation: ${pulse} 2.4s ease-in-out infinite;
 `;
 
 const Subtext = styled.div`
   margin-top: 8px;
-  color: #9ca3af;
+  color: #64748b;
   font-size: 16px;
 `;
 
@@ -104,7 +104,7 @@ const QuoteWrap = styled.div`
 const QuoteText = styled.blockquote`
   position: relative;
   margin: 0 0 16px 0;
-  color: #94a3b8;
+  color: #64748b;
   font-size: 36px;
   font-style: italic;
   font-weight: 500;
@@ -114,7 +114,7 @@ const QuoteText = styled.blockquote`
 
   &::before {
     display: block;
-    color: #cbd5e1;
+    color: #1e293b;
     font-size: 28px;
     line-height: 1;
     margin-bottom: 8px;
@@ -123,7 +123,7 @@ const QuoteText = styled.blockquote`
 `;
 
 const QuoteAuthor = styled.div`
-  color: #9ca3af;
+  color: #64748b;
   font-size: 14px;
   margin-left: 2px;
 `;

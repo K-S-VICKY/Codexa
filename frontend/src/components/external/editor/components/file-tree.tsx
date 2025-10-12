@@ -312,6 +312,7 @@ const Div = styled.div<{
   align-items: center;
   padding-left: ${props => props.depth * 16}px;
   background-color: ${props => props.isSelected ? "#242424" : props.isDragOver ? "#333" : "transparent"};
+  color: #ffffff;
 
   :hover {
     cursor: pointer;

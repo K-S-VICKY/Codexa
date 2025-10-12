@@ -11,7 +11,7 @@ import codexaBg from '../assets/codexa-bg.svg';
 const Container = styled.div`
   min-height: 100vh;
   background: 
-    linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(26, 26, 46, 0.9) 50%, rgba(22, 33, 62, 0.9) 100%),
+    linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.95) 50%, rgba(219, 234, 254, 0.95) 100%),
     url(${codexaBg});
   background-size: cover;
   background-position: center;
@@ -26,18 +26,18 @@ const Header = styled.div`
 `;
 
 const Title = styled.h1`
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 36px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 `;
 
 const Subtitle = styled.p`
-  color: #94a3b8;
+  color: #64748b;
   font-size: 18px;
   margin: 0;
 `;
@@ -48,9 +48,9 @@ const Content = styled.div`
 `;
 
 const CreateProjectCard = styled.div`
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 20px;
   padding: 32px;
   margin-bottom: 32px;
@@ -58,7 +58,7 @@ const CreateProjectCard = styled.div`
 `;
 
 const CreateProjectHeader = styled.h2`
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 20px;
   font-weight: 600;
   margin: 0 0 24px 0;
@@ -84,11 +84,11 @@ const InputGroup = styled.div`
 const Select = styled.select`
   width: 100%;
   padding: 16px 16px 8px 16px;
-  border: 2px solid rgba(148, 163, 184, 0.2);
+  border: 2px solid rgba(226, 232, 240, 0.8);
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 16px;
   font-family: inherit;
   outline: none;
@@ -96,17 +96,18 @@ const Select = styled.select`
   min-height: 56px;
   
   &:focus {
-    border-color: #6366f1;
-    background: rgba(15, 23, 42, 0.8);
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   &:hover:not(:focus) {
-    border-color: rgba(148, 163, 184, 0.4);
+    border-color: rgba(59, 130, 246, 0.5);
   }
   
   option {
-    background: #1e293b;
-    color: #e2e8f0;
+    background: #ffffff;
+    color: #1e293b;
   }
 `;
 
@@ -118,9 +119,8 @@ const ProjectsGrid = styled.div`
 `;
 
 const ProjectCard = styled.div`
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: #F3F4F6; /* light grey */
+  border: 1px solid #E5E7EB; /* light border */
   border-radius: 16px;
   padding: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -128,13 +128,13 @@ const ProjectCard = styled.div`
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
-    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 122, 204, 0.25);
   }
 `;
 
 const ProjectName = styled.h3`
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 8px 0;
