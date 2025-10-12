@@ -9,12 +9,16 @@ const Container = styled.div`
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background:white;
-
-  padding: 20px;
+  justify-content: flex-end;
+  background: url('/codexa_bg.png') center center / cover no-repeat;
+  padding: 0;
   position: relative;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    padding: 20px;
+  }
 `;
 
 
@@ -32,6 +36,7 @@ const LoginCard = styled.div`
     inset 0 1px 0 rgba(19, 57, 140, 0.8);
   position: relative;
   z-index: 1;
+  margin-right: 6vw;
   
   &::before {
     content: '';
@@ -43,6 +48,10 @@ const LoginCard = styled.div`
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%);
     border-radius: 24px;
     z-index: -1;
+  }
+
+  @media (max-width: 768px) {
+    margin-right: 0;
   }
 `;
 
