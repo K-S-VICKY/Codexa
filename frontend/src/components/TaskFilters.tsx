@@ -26,48 +26,57 @@ const FilterGroup = styled.div`
 
 const FilterLabel = styled.label`
   font-size: 11px;
-  font-weight: 500;
-  color: #999;
+  font-weight: 600;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
 
 const Select = styled.select`
-  background: #1e1e1e;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  padding: 4px 8px;
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #111827;
   font-size: 12px;
   cursor: pointer;
-  min-width: 100px;
+  min-width: 120px;
   
   &:focus {
     outline: none;
-    border-color: #007acc;
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
   
   option {
-    background: #1e1e1e;
-    color: #ffffff;
+    background: #ffffff;
+    color: #111827;
   }
 `;
 
 const ClearFiltersButton = styled.button`
-  background: transparent;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  padding: 4px 8px;
-  color: #cccccc;
+  appearance: none;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #8b5cf6, #22d3ee);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+  color: #111827;
+  padding: 6px 12px;
+  border-radius: 9999px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   margin-top: 16px;
   align-self: flex-start;
+  transition: box-shadow 0.2s ease, transform 0.05s ease, background 0.2s ease;
   
   &:hover {
-    background: #333;
-    border-color: #555;
+    transform: translateY(-1px);
+    background: linear-gradient(rgba(0, 122, 204, 0.08), rgba(0, 122, 204, 0.08)) padding-box,
+                linear-gradient(135deg, #0090FF, #7c3aed) border-box;
   }
+
+  &:active { transform: translateY(1px); }
 `;
 
 const FilterChips = styled.div`
@@ -78,19 +87,14 @@ const FilterChips = styled.div`
 `;
 
 const FilterChip = styled.span<{ active: boolean }>`
-  background: ${props => props.active ? '#007acc' : '#333'};
-  color: ${props => props.active ? '#ffffff' : '#cccccc'};
+  background: ${props => props.active ? '#eef2ff' : '#f3f4f6'};
+  color: ${props => props.active ? '#3730a3' : '#374151'};
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid ${props => props.active ? '#007acc' : '#555'};
-  
-  &:hover {
-    background: ${props => props.active ? '#005a9e' : '#444'};
-  }
+  font-weight: 600;
+  cursor: default;
+  border: 1px solid ${props => props.active ? '#c7d2fe' : '#e5e7eb'};
 `;
 
 export const TaskFilters: React.FC<TaskFiltersProps> = ({

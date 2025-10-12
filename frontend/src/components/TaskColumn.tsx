@@ -27,32 +27,32 @@ const ColumnHeader = styled.div`
   align-items: center;
   padding: 8px 12px;
   margin-bottom: 8px;
-  background: #2d2d30;
-  border-radius: 6px;
-  border: 1px solid #3e3e42;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 `;
 
 const ColumnTitle = styled.h4`
   margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  color: #cccccc;
+  font-weight: 700;
+  color: #111827;
 `;
 
 const TaskCount = styled.span`
-  background: #007acc;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 2px 8px;
+  border-radius: 9999px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
 `;
 
 const TaskList = styled.div<{ isDraggingOver: boolean }>`
   flex: 1;
   padding: 4px;
-  border-radius: 6px;
-  background: ${props => props.isDraggingOver ? '#1a1a1a' : 'transparent'};
+  border-radius: 8px;
+  background: ${props => props.isDraggingOver ? '#f3f4f6' : 'transparent'};
   transition: background-color 0.2s ease;
   min-height: 100px;
 `;
@@ -62,11 +62,11 @@ const EmptyMessage = styled.div`
   align-items: center;
   justify-content: center;
   height: 100px;
-  color: #666;
+  color: #6b7280;
   font-size: 12px;
   text-align: center;
-  border: 2px dashed #333;
-  border-radius: 6px;
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
   margin: 4px 0;
 `;
 

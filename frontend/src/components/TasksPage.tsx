@@ -16,10 +16,9 @@ const Header = styled.div`
   align-items: flex-start;
   gap: 8px;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 `;
 
 const Logo = styled.div`
@@ -32,42 +31,49 @@ const Logo = styled.div`
 `;
 
 const BackButton = styled.button`
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.75) 0%, rgba(139, 92, 246, 0.75) 100%);
-  border: none;
-  color: white;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 6px;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 36px;
+  appearance: none;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #8b5cf6, #22d3ee);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+  color: #111827;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  
+  transition: box-shadow 0.2s ease, transform 0.05s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
   &:hover {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+    transform: translateY(-1px);
+    background: linear-gradient(rgba(0, 122, 204, 0.08), rgba(0, 122, 204, 0.08)) padding-box,
+                linear-gradient(135deg, #0090FF, #7c3aed) border-box;
   }
+
+  &:active { transform: translateY(1px); }
 `;
 
 const Content = styled.div`
   flex: 1;
-  padding: 24px;
+  padding: 0;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: stretch;
+  align-items: stretch;
 `;
 
 const TaskManagerContainer = styled.div`
   width: 100%;
-  max-width: 1200px;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 80px);
   background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
 const LoadingContainer = styled.div`
@@ -162,9 +168,7 @@ export const TasksPage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <BackButton onClick={handleBackToCoding} aria-label="Back">
-          ←
-        </BackButton>
+        <BackButton onClick={handleBackToCoding} aria-label="Back">← Back</BackButton>
         <Logo>Codexa - Task Manager</Logo>
       </Header>
       
