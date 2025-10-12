@@ -13,8 +13,8 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  background-color: #0f0f23;
-  color: #e2e8f0;
+  background-color: #FFFFFF;
+  color: #1E293B;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -33,27 +33,27 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: #F3F4F6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(0, 122, 204, 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: rgba(0, 122, 204, 0.6);
 }
 
 /* Selection styling */
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: #e2e8f0;
+  background: rgba(0, 122, 204, 0.2);
+  color: #1E293B;
 }
 
 ::-moz-selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: #e2e8f0;
+  background: rgba(0, 122, 204, 0.2);
+  color: #1E293B;
 }
 
 /* Focus outline improvements */
@@ -62,7 +62,7 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid #007ACC;
   outline-offset: 2px;
 }
 
@@ -73,12 +73,12 @@ button, input, select, textarea, a {
 
 /* Improved link styling */
 a {
-  color: #6366f1;
+  color: #007ACC;
   text-decoration: none;
 }
 
 a:hover {
-  color: #8b5cf6;
+  color: #0090FF;
   text-decoration: underline;
 }
 

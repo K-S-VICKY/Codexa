@@ -145,8 +145,19 @@ export const TerminalComponent = ({ socket }: {socket: Socket}) => {
         }
     }, [socket]);
 
+    // Refit terminal on window resize to keep sizing in sync with panel
+    useEffect(() => {
+        const onResize = () => {
+            try {
+                fitAddon.fit();
+            } catch {}
+        };
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
     return (
-        <div style={{width: "40vw", height: "400px", textAlign: "left"}} ref={terminalRef}>
+        <div style={{ width: "100%", height: "100%", textAlign: "left" }} ref={terminalRef}>
             {!isTerminalReady && (
                 <div style={{color: '#888', padding: '10px'}}>
                     Initializing terminal...

@@ -18,7 +18,7 @@ const spin = keyframes`
 `;
 
 const BaseButton = styled.button<{
-  variant: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant: 'primary' | 'secondary' | 'ghost' | 'danger' | 'gradientOutline';
   size: 'sm' | 'md' | 'lg';
   isLoading: boolean;
 }>`
@@ -62,16 +62,19 @@ const BaseButton = styled.button<{
   
   /* Color variants */
   ${props => {
+    const c = props.theme.colors;
+    const s = props.theme.shadows;
     switch (props.variant) {
       case 'primary':
         return `
-          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-          color: white;
-          box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+          background: ${c.accent};
+          color: ${c.white};
+          box-shadow: ${s.primary};
           
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px 0 rgba(99, 102, 241, 0.4);
+            background: ${c.accentHover};
+            box-shadow: ${s.primaryHover};
           }
           
           &:active:not(:disabled) {
@@ -80,33 +83,47 @@ const BaseButton = styled.button<{
         `;
       case 'secondary':
         return `
-          background: rgba(99, 102, 241, 0.1);
-          color: #6366f1;
-          border: 1px solid rgba(99, 102, 241, 0.2);
+          background: #37373D;
+          color: ${c.textPrimary};
+          border: 1px solid #3A3A3F;
           
           &:hover:not(:disabled) {
-            background: rgba(99, 102, 241, 0.15);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: #404048;
+            border-color: #47474E;
           }
         `;
       case 'ghost':
         return `
           background: transparent;
-          color: #e2e8f0;
+          color: ${c.textPrimary};
           
           &:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 122, 204, 0.12);
           }
         `;
       case 'danger':
         return `
-          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-          color: white;
-          box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.3);
+          background: linear-gradient(135deg, #F44747 0%, #d83a3a 100%);
+          color: ${c.white};
+          box-shadow: ${s.danger};
           
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px 0 rgba(239, 68, 68, 0.4);
+            box-shadow: ${s.dangerHover};
+          }
+        `;
+      case 'gradientOutline':
+        return `
+          background: linear-gradient(#ffffff, #ffffff) padding-box,
+                      linear-gradient(135deg, #3b82f6, #8b5cf6) border-box;
+          color: #000000;
+          border: 2px solid transparent;
+          box-shadow: none;
+          
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            background: linear-gradient(rgba(0, 122, 204, 0.08), rgba(0, 122, 204, 0.08)) padding-box,
+                        linear-gradient(135deg, #0090FF, #7c3aed) border-box;
           }
         `;
       default:
@@ -121,7 +138,7 @@ const BaseButton = styled.button<{
   }
   
   &:focus-visible {
-    outline: 2px solid #6366f1;
+    outline: 2px solid ${props => props.theme.colors.accent};
     outline-offset: 2px;
   }
   
@@ -163,7 +180,7 @@ const RippleEffect = styled.span`
 `;
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'gradientOutline';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;

@@ -17,7 +17,7 @@ const Container = styled.div`
   flex-direction: column;
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #dbeafe 100%);
 `;
 
 const Header = styled.div`
@@ -25,16 +25,16 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
 const Logo = styled.div`
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -104,12 +104,12 @@ const ModalBackdrop = styled.div`
 `;
 
 const Modal = styled.div`
-  background: #0f172a;
-  border: 1px solid rgba(148,163,184,0.15);
-  color: #e2e8f0;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  color: #1E293B;
   width: min(92vw, 520px);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
   overflow: hidden;
 `;
 
@@ -118,8 +118,8 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #111827;
-  border-bottom: 1px solid rgba(148,163,184,0.12);
+  background: #E5E7EB;
+  border-bottom: 1px solid #D1D5DB;
 `;
 
 const ModalBody = styled.div`
@@ -143,9 +143,9 @@ const TimeDisplay = styled.div`
 `;
 
 const SmallInput = styled.input`
-  background: #1f2937;
-  border: 1px solid #374151;
-  color: #e5e7eb;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  color: #1E293B;
   padding: 6px 10px;
   border-radius: 8px;
   width: 80px;
@@ -351,10 +351,10 @@ export const CodingPagePostPodCreation = () => {
             <StatusDot connected={true} />
             Connected
           </StatusIndicator>
-          <Button variant="primary" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
-          <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
-          <Button variant="secondary" size="sm" onClick={async () => { await enterFullscreen(); setShowZen(true); }}>Zen Mode</Button>
-          <Button variant="secondary" size="sm" onClick={handleLogout}>
+          <Button variant="gradientOutline" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
+          <Button variant="gradientOutline" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
+          <Button variant="gradientOutline" size="sm" onClick={async () => { await enterFullscreen(); setShowZen(true); }}>Zen Mode</Button>
+          <Button variant="gradientOutline" size="sm" onClick={handleLogout}>
             <FiLogOut style={{ marginRight: '6px' }} />
             Logout
           </Button>
@@ -396,15 +396,15 @@ export const CodingPagePostPodCreation = () => {
           <Modal>
             <ModalHeader>
               <div>Pomodoro</div>
-              <Button variant="secondary" size="sm" onClick={() => setShowPomodoro(false)}>Close</Button>
+              <Button variant="gradientOutline" size="sm" onClick={() => setShowPomodoro(false)}>Close</Button>
             </ModalHeader>
             <ModalBody>
               {breakPromptOpen && (
-                <div style={{ background:'#1f2937', border:'1px solid #374151', borderRadius:8, padding:12 }}>
+                <div style={{ background:'#E5E7EB', border:'1px solid #D1D5DB', borderRadius:8, padding:12 }}>
                   <div style={{ marginBottom:8, fontWeight:700 }}>It's time for a break</div>
                   <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                    <Button variant="primary" size="sm" onClick={() => { setIsRunning(true); }}>Wait till break is over</Button>
-                    <Button variant="secondary" size="sm" onClick={() => {
+                    <Button variant="gradientOutline" size="sm" onClick={() => { setIsRunning(true); }}>Wait till break is over</Button>
+                    <Button variant="gradientOutline" size="sm" onClick={() => {
                       setIsBreak(false);
                       setSecondsLeft(workMinutes * 60);
                       setIsRunning(true);
@@ -430,8 +430,8 @@ export const CodingPagePostPodCreation = () => {
                 <TimeDisplay>{format(secondsLeft)}{isBreak ? ' (Break)' : ''}</TimeDisplay>
               </Row>
               <Row>
-                <Button variant="primary" size="sm" onClick={() => { setBreakPromptOpen(false); startPause(); }}>{isRunning ? 'Pause' : 'Start'}</Button>
-                <Button variant="secondary" size="sm" onClick={reset}>Reset</Button>
+                <Button variant="gradientOutline" size="sm" onClick={() => { setBreakPromptOpen(false); startPause(); }}>{isRunning ? 'Pause' : 'Start'}</Button>
+                <Button variant="gradientOutline" size="sm" onClick={reset}>Reset</Button>
               </Row>
             </ModalBody>
           </Modal>
@@ -444,7 +444,7 @@ export const CodingPagePostPodCreation = () => {
           <Modal>
             <ModalHeader>
               <div>Zen Mode (Spotify)</div>
-              <Button variant="secondary" size="sm" onClick={() => setShowZen(false)}>Close</Button>
+              <Button variant="gradientOutline" size="sm" onClick={() => setShowZen(false)}>Close</Button>
             </ModalHeader>
             <ModalBody>
               <div style={{ marginBottom:12, fontWeight:700 }}>Choose Language Playlist 🎶</div>
@@ -452,28 +452,21 @@ export const CodingPagePostPodCreation = () => {
                 {Object.keys(LANG_PLAYLISTS).map(lang => {
                   const active = lang===selectedLang;
                   return (
-                    <button 
-                      key={lang} 
-                      onClick={()=>setSelectedLang(lang as keyof typeof LANG_PLAYLISTS)} 
-                      style={{
-                        padding:'6px 12px',
-                        borderRadius:20,
-                        border: active?'2px solid #22d3ee':'1px solid #374151',
-                        background: active?'rgba(34,211,238,0.2)':'#1f2937',
-                        color:'#e2e8f0',
-                        cursor:'pointer',
-                        fontWeight:700,
-                        textTransform:'capitalize'
-                      }}
+                    <Button
+                      key={lang}
+                      variant="gradientOutline"
+                      size="sm"
+                      onClick={()=>setSelectedLang(lang as keyof typeof LANG_PLAYLISTS)}
+                      style={{ textTransform:'capitalize', fontWeight:700, opacity: active? 1 : 0.9 }}
                     >
                       {lang}
-                    </button>
+                    </Button>
                   )
                 })}
               </div>
               <div style={{ display:'flex', gap:8 }}>
                 <Button 
-                  variant="primary" 
+                  variant="gradientOutline" 
                   size="sm" 
                   onClick={() => {
                     setBackgroundPlaying(true);
@@ -483,7 +476,7 @@ export const CodingPagePostPodCreation = () => {
                   Play
                 </Button>
                 <Button 
-                  variant="secondary" 
+                  variant="gradientOutline" 
                   size="sm" 
                   onClick={() => setBackgroundPlaying(false)}
                 >
@@ -501,14 +494,14 @@ export const CodingPagePostPodCreation = () => {
           <Modal>
             <ModalHeader>
               <div>Confirm Logout</div>
-              <Button variant="secondary" size="sm" onClick={() => setShowLogoutConfirm(false)}>×</Button>
+              <Button variant="gradientOutline" size="sm" onClick={() => setShowLogoutConfirm(false)}>×</Button>
             </ModalHeader>
             <ModalBody>
-              <div style={{ marginBottom: 16, color: '#e2e8f0' }}>
+              <div style={{ marginBottom: 16, color: '#1E293B' }}>
                 Are you sure you want to logout? Any unsaved work will be lost.
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                <Button variant="secondary" size="sm" onClick={() => setShowLogoutConfirm(false)}>
+                <Button variant="gradientOutline" size="sm" onClick={() => setShowLogoutConfirm(false)}>
                   Cancel
                 </Button>
                 <Button variant="primary" size="sm" onClick={confirmLogout}>
