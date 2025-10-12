@@ -217,6 +217,7 @@ export const CodingPagePostPodCreation = () => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const [showPortSelector, setShowPortSelector] = useState(false);
   const [selectedPort, setSelectedPort] = useState<number>(3000);
+  const [downloading, setDownloading] = useState(false);
 
   // Pomodoro state
   const [showPomodoro, setShowPomodoro] = useState(false);
@@ -242,6 +243,73 @@ export const CodingPagePostPodCreation = () => {
   // Logout function
   const handleLogout = () => {
     setShowLogoutConfirm(true);
+  };
+
+  // Download project as ZIP
+  const downloadProject = async () => {
+    try {
+      setDownloading(true);
+      // Load JSZip as an ES module (bundled by Vite)
+      const { default: JSZip } = await import('jszip');
+      const zip = new JSZip();
+
+      // Helper to fetch file content via socket as Promise
+      const fetchFileContent = (path: string) => new Promise<string>((resolve) => {
+        socket?.emit('fetchContent', { path }, (data: string) => resolve(data ?? ''));
+      });
+
+      // Sanitize and normalize a path for ZIP entry (Windows-safe)
+      const sanitizeZipPath = (p: string): string => {
+        const project = replId || 'project';
+        let rel = (p || '').trim();
+        if (!rel) return `${project}/unnamed`;
+        // Normalize separators and remove leading roots
+        rel = rel.replace(/\\+/g, '/');
+        rel = rel.replace(/^\/*/, '');
+        // Replace illegal Windows filename characters in each segment
+        rel = rel
+          .split('/')
+          .map(seg => seg.replace(/[<>:"|?*]/g, '_'))
+          .filter(Boolean)
+          .join('/');
+        // Ensure project folder prefix
+        if (!rel.startsWith(project + '/')) rel = `${project}/${rel}`;
+        return rel;
+      };
+
+      // Ensure we have file listing; fetch if not yet available
+      let allFiles = (fileStructure || []).filter((f) => f.type === 'file');
+      if ((!allFiles || allFiles.length === 0) && socket) {
+        allFiles = await new Promise<RemoteFile[]>((resolve) => {
+          socket.emit('fetchDir', '', (data: RemoteFile[]) => {
+            resolve((data || []).filter((f) => f.type === 'file'));
+          });
+        });
+      }
+      if (!allFiles || allFiles.length === 0) {
+        throw new Error('No files found in project');
+      }
+
+      // Fetch all contents in parallel and add to zip preserving paths
+      await Promise.all(allFiles.map(async (f) => {
+        const content = await fetchFileContent(f.path);
+        const entryPath = sanitizeZipPath(f.path || f.name);
+        zip.file(entryPath, content, { binary: false });
+      }));
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${replId || 'project'}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    } catch (e) {
+      console.error('Failed to download project:', e);
+      alert(`Failed to create ZIP. ${e instanceof Error ? e.message : ''}`);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const confirmLogout = () => {
@@ -351,6 +419,9 @@ export const CodingPagePostPodCreation = () => {
             <StatusDot connected={true} />
             Connected
           </StatusIndicator>
+          <Button variant="gradientOutline" size="sm" onClick={downloadProject} disabled={downloading}>
+            {downloading ? 'Preparing Zip…' : 'Download Project'}
+          </Button>
           <Button variant="gradientOutline" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
           <Button variant="gradientOutline" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
           <Button variant="gradientOutline" size="sm" onClick={async () => { await enterFullscreen(); setShowZen(true); }}>Zen Mode</Button>
