@@ -15,6 +15,7 @@ const OPTIONS_TERM = {
     rows: 24,
     convertEol: true,
     allowTransparency: false,
+    scrollback: 5000,
     fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
     fontSize: 14,
     lineHeight: 1.2,
@@ -83,6 +84,9 @@ export const TerminalComponent = ({ socket }: {socket: Socket}) => {
                 }
                 console.log('Terminal data:', str);
                 termRef.current.write(str);
+                try {
+                    termRef.current.scrollToBottom();
+                } catch {}
             }
         }
 
@@ -145,7 +149,7 @@ export const TerminalComponent = ({ socket }: {socket: Socket}) => {
         }
     }, [socket]);
 
-    // Refit terminal on window resize to keep sizing in sync with panel
+    // Refit terminal on container and window resize to keep sizing in sync with panel
     useEffect(() => {
         const onResize = () => {
             try {
@@ -153,11 +157,19 @@ export const TerminalComponent = ({ socket }: {socket: Socket}) => {
             } catch {}
         };
         window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        let observer: ResizeObserver | undefined;
+        if (terminalRef.current && 'ResizeObserver' in window) {
+            observer = new ResizeObserver(() => onResize());
+            observer.observe(terminalRef.current);
+        }
+        return () => {
+            window.removeEventListener('resize', onResize);
+            if (observer && terminalRef.current) observer.unobserve(terminalRef.current);
+        };
     }, []);
 
     return (
-        <div style={{ width: "100%", height: "100%", textAlign: "left" }} ref={terminalRef}>
+        <div style={{ width: "100%", height: "100%", minHeight: 0, textAlign: "left", display: 'flex' }} ref={terminalRef}>
             {!isTerminalReady && (
                 <div style={{color: '#888', padding: '10px'}}>
                     Initializing terminal...

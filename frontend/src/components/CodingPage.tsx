@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Editor } from './Editor';
 import { File, RemoteFile, Type } from './external/editor/utils/file-manager';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -90,6 +90,9 @@ const RightPanel = styled.div`
   background: rgba(15, 23, 42, 0.2);
   display: flex;
   flex-direction: column;
+  /* critical for flex children to be scrollable instead of growing */
+  min-height: 0;
+  overflow: hidden;
 `;
 
 // Modal styles
@@ -217,6 +220,9 @@ export const CodingPagePostPodCreation = () => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const [showPortSelector, setShowPortSelector] = useState(false);
   const [selectedPort, setSelectedPort] = useState<number>(3000);
+  const [downloading, setDownloading] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
 
   // Pomodoro state
   const [showPomodoro, setShowPomodoro] = useState(false);
@@ -242,6 +248,73 @@ export const CodingPagePostPodCreation = () => {
   // Logout function
   const handleLogout = () => {
     setShowLogoutConfirm(true);
+  };
+
+  // Download project as ZIP
+  const downloadProject = async () => {
+    try {
+      setDownloading(true);
+      // Load JSZip as an ES module (bundled by Vite)
+      const { default: JSZip } = await import('jszip');
+      const zip = new JSZip();
+
+      // Helper to fetch file content via socket as Promise
+      const fetchFileContent = (path: string) => new Promise<string>((resolve) => {
+        socket?.emit('fetchContent', { path }, (data: string) => resolve(data ?? ''));
+      });
+
+      // Sanitize and normalize a path for ZIP entry (Windows-safe)
+      const sanitizeZipPath = (p: string): string => {
+        const project = replId || 'project';
+        let rel = (p || '').trim();
+        if (!rel) return `${project}/unnamed`;
+        // Normalize separators and remove leading roots
+        rel = rel.replace(/\\+/g, '/');
+        rel = rel.replace(/^\/*/, '');
+        // Replace illegal Windows filename characters in each segment
+        rel = rel
+          .split('/')
+          .map(seg => seg.replace(/[<>:"|?*]/g, '_'))
+          .filter(Boolean)
+          .join('/');
+        // Ensure project folder prefix
+        if (!rel.startsWith(project + '/')) rel = `${project}/${rel}`;
+        return rel;
+      };
+
+      // Ensure we have file listing; fetch if not yet available
+      let allFiles = (fileStructure || []).filter((f) => f.type === 'file');
+      if ((!allFiles || allFiles.length === 0) && socket) {
+        allFiles = await new Promise<RemoteFile[]>((resolve) => {
+          socket.emit('fetchDir', '', (data: RemoteFile[]) => {
+            resolve((data || []).filter((f) => f.type === 'file'));
+          });
+        });
+      }
+      if (!allFiles || allFiles.length === 0) {
+        throw new Error('No files found in project');
+      }
+
+      // Fetch all contents in parallel and add to zip preserving paths
+      await Promise.all(allFiles.map(async (f) => {
+        const content = await fetchFileContent(f.path);
+        const entryPath = sanitizeZipPath(f.path || f.name);
+        zip.file(entryPath, content, { binary: false });
+      }));
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${replId || 'project'}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    } catch (e) {
+      console.error('Failed to download project:', e);
+      alert(`Failed to create ZIP. ${e instanceof Error ? e.message : ''}`);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const confirmLogout = () => {
@@ -307,6 +380,61 @@ export const CodingPagePostPodCreation = () => {
     });
   };
 
+  // Import Project (folder picker)
+  const handleClickImport = () => {
+    folderInputRef.current?.click();
+  };
+
+  const ensureFolders = async (dirPath: string) => {
+    if (!socket) return;
+    const segments = dirPath.split('/').filter(Boolean);
+    let cur = '';
+    for (const seg of segments) {
+      cur = cur ? `${cur}/${seg}` : seg;
+      await new Promise<void>((resolve) => {
+        socket.emit('createFolder', { path: cur }, () => resolve());
+      });
+    }
+  };
+
+  const importFolderFiles = async (fileList: FileList) => {
+    if (!socket) return;
+    setImporting(true);
+    try {
+      // Convert to array and sort by path depth so folders/files process deterministically
+      const files = Array.from(fileList).filter(f => !!(f as any).webkitRelativePath);
+      // Determine top folder to strip from paths
+      const rootPrefix = files[0] ? (files[0] as any).webkitRelativePath.split('/')[0] : '';
+
+      for (const f of files) {
+        const webkitPath: string = (f as any).webkitRelativePath || f.name;
+        // Strip the top-level folder name
+        const relAfterRoot = webkitPath.startsWith(rootPrefix + '/') ? webkitPath.slice(rootPrefix.length + 1) : webkitPath;
+        const normPath = relAfterRoot.replace(/\\+/g, '/');
+        const dir = normPath.split('/').slice(0, -1).join('/');
+        if (dir) {
+          await ensureFolders(dir);
+        }
+        // Create file then write content
+        await new Promise<void>((resolve) => {
+          socket.emit('createFile', { path: normPath }, () => resolve());
+        });
+        const content = await f.text();
+        await new Promise<void>((resolve) => {
+          socket.emit('updateContent', { path: normPath, content }, () => resolve());
+        });
+      }
+      refreshFileStructure();
+      alert('Import completed');
+    } catch (e) {
+      console.error('Import failed:', e);
+      alert('Import failed');
+    } finally {
+      setImporting(false);
+      if (folderInputRef.current) folderInputRef.current.value = '';
+    }
+  };
+
   const onSelect = (file: File) => {
     if (file.type === Type.DIRECTORY) {
       socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
@@ -351,6 +479,25 @@ export const CodingPagePostPodCreation = () => {
             <StatusDot connected={true} />
             Connected
           </StatusIndicator>
+          <input
+            type="file"
+            ref={folderInputRef}
+            style={{ display: 'none' }}
+            // @ts-ignore - webkitdirectory is non-standard but supported in Chromium/Edge
+            webkitdirectory=""
+            multiple
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                importFolderFiles(e.target.files);
+              }
+            }}
+          />
+          <Button variant="gradientOutline" size="sm" onClick={handleClickImport} disabled={importing}>
+            {importing ? 'Importing…' : 'Import Project'}
+          </Button>
+          <Button variant="gradientOutline" size="sm" onClick={downloadProject} disabled={downloading}>
+            {downloading ? 'Preparing Zip…' : 'Download Project'}
+          </Button>
           <Button variant="gradientOutline" size="sm" onClick={() => setShowPortSelector(true)}>Open Port</Button>
           <Button variant="gradientOutline" size="sm" onClick={() => setShowPomodoro(true)}>Pomodoro</Button>
           <Button variant="gradientOutline" size="sm" onClick={async () => { await enterFullscreen(); setShowZen(true); }}>Zen Mode</Button>
@@ -375,7 +522,9 @@ export const CodingPagePostPodCreation = () => {
           )}
         </LeftPanel>
         <RightPanel>
-          {socket && <TerminalComponent socket={socket} />}
+          <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+            {socket && <TerminalComponent socket={socket} />}
+          </div>
         </RightPanel>
       </Workspace>
 
