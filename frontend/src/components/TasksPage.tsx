@@ -12,8 +12,9 @@ const Container = styled.div`
 
 const Header = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   padding: 16px 24px;
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(10px);
@@ -31,18 +32,22 @@ const Logo = styled.div`
 `;
 
 const BackButton = styled.button`
-  background: #007acc;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.75) 0%, rgba(139, 92, 246, 0.75) 100%);
   border: none;
   color: white;
-  padding: 8px 16px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 36px;
+  text-align: center;
   cursor: pointer;
   transition: background-color 0.2s ease;
   
   &:hover {
-    background: #005a9e;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
   }
 `;
 
@@ -146,8 +151,8 @@ export const TasksPage: React.FC = () => {
         <LoadingSubtext>
           Project ID: {projectId || 'Not found'} | User ID: {userId || 'Not found'}
         </LoadingSubtext>
-        <BackButton onClick={handleBackToCoding} style={{ marginTop: '24px' }}>
-          Back to Coding
+        <BackButton onClick={handleBackToCoding} style={{ marginTop: '24px' }} aria-label="Back">
+          ←
         </BackButton>
       </LoadingContainer>
     );
@@ -156,10 +161,10 @@ export const TasksPage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Logo>Codexa - Task Manager</Logo>
-        <BackButton onClick={handleBackToCoding}>
-          ← Back to Coding
+        <BackButton onClick={handleBackToCoding} aria-label="Back">
+          ←
         </BackButton>
+        <Logo>Codexa - Task Manager</Logo>
       </Header>
       
       <Content>
