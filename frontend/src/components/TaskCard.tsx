@@ -11,9 +11,9 @@ interface TaskCardProps {
 }
 
 const Card = styled.div<{ compact?: boolean }>`
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: ${props => props.compact ? '8px' : '12px'};
   margin-bottom: ${props => props.compact ? '6px' : '8px'};
   cursor: pointer;
@@ -21,10 +21,9 @@ const Card = styled.div<{ compact?: boolean }>`
   position: relative;
 
   &:hover {
-    background: #37373d;
-    border-color: #007acc;
+    border-color: #c7d2fe;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
   }
 `;
 
@@ -38,8 +37,8 @@ const CardHeader = styled.div`
 const TaskTitle = styled.h5`
   margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 700;
+  color: #111827;
   line-height: 1.3;
   flex: 1;
   margin-right: 8px;
@@ -69,7 +68,7 @@ const DragHandle = styled.div`
   width: 14px;
   height: 14px;
   border-radius: 3px;
-  background: #3e3e42;
+  background: #e5e7eb;
   display: inline-block;
   cursor: grab;
   flex-shrink: 0;
@@ -78,7 +77,7 @@ const DragHandle = styled.div`
 const TaskDescription = styled.p`
   margin: 0 0 8px 0;
   font-size: 12px;
-  color: #cccccc;
+  color: #374151;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -96,9 +95,9 @@ const TaskFooter = styled.div`
 const Deadline = styled.div<{ isOverdue: boolean; isUpcoming: boolean }>`
   font-size: 11px;
   color: ${props => {
-    if (props.isOverdue) return '#ff4757';
-    if (props.isUpcoming) return '#ffa502';
-    return '#999';
+    if (props.isOverdue) return '#b91c1c';
+    if (props.isUpcoming) return '#b45309';
+    return '#6b7280';
   }};
   font-weight: 500;
 `;
@@ -115,18 +114,30 @@ const ActionButtons = styled.div`
 `;
 
 const ActionButton = styled.button<{ variant: 'edit' | 'delete' }>`
-  background: ${props => props.variant === 'edit' ? '#007acc' : '#ff4757'};
-  border: none;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
+  appearance: none;
+  ${props => props.variant === 'edit'
+    ? `background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #8b5cf6, #22d3ee);`
+    : `background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #f43f5e, #f59e0b);`}
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+  color: #111827;
+  padding: 2px 8px;
+  border-radius: 9999px;
   font-size: 10px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.05s ease;
 
   &:hover {
-    background: ${props => props.variant === 'edit' ? '#005a9e' : '#ff3742'};
+    transform: translateY(-1px);
+    background: linear-gradient(rgba(0, 122, 204, 0.08), rgba(0, 122, 204, 0.08)) padding-box,
+                ${props => props.variant === 'edit' 
+                  ? 'linear-gradient(135deg, #0090FF, #7c3aed)'
+                  : 'linear-gradient(135deg, #ef4444, #f59e0b)'} border-box;
   }
+
+  &:active { transform: translateY(1px); }
 `;
 
 const OverdueIndicator = styled.div`
@@ -135,8 +146,8 @@ const OverdueIndicator = styled.div`
   left: -1px;
   right: -1px;
   height: 3px;
-  background: linear-gradient(90deg, #ff4757, #ff3742);
-  border-radius: 6px 6px 0 0;
+  background: linear-gradient(90deg, #ef4444, #f43f5e);
+  border-radius: 8px 8px 0 0;
 `;
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDelete, compact = false }) => {

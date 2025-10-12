@@ -21,8 +21,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1e1e1e;
-  color: #ffffff;
+  background: #ffffff;
+  color: #111827;
 `;
 
 const Header = styled.div`
@@ -30,15 +30,15 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #333;
-  background: #252526;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
 `;
 
 const Title = styled.h3`
   margin: 0;
   font-size: 14px;
-  font-weight: 600;
-  color: #cccccc;
+  font-weight: 700;
+  color: #111827;
 `;
 
 const HeaderActions = styled.div`
@@ -48,43 +48,55 @@ const HeaderActions = styled.div`
 `;
 
 const AddButton = styled.button`
-  background: #007acc;
-  border: none;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  appearance: none;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #8b5cf6, #22d3ee);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+  color: #111827;
+  padding: 6px 12px;
+  border-radius: 9999px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
-  
+  gap: 6px;
+  transition: box-shadow 0.2s ease, transform 0.05s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
   &:hover {
-    background: #005a9e;
+    transform: translateY(-1px);
+    background: linear-gradient(rgba(0, 122, 204, 0.08), rgba(0, 122, 204, 0.08)) padding-box,
+                linear-gradient(135deg, #0090FF, #7c3aed) border-box;
   }
+
+  &:active { transform: translateY(1px); }
 `;
 
 const CloseButton = styled.button`
   background: transparent;
   border: none;
-  color: #cccccc;
+  color: #6b7280;
   padding: 4px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   
   &:hover {
-    background: #333;
+    background: #f3f4f6;
   }
 `;
 
 const StatsContainer = styled.div`
   padding: 8px 16px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
 `;
 
 const FiltersContainer = styled.div`
   padding: 8px 16px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
 `;
 
 const KanbanBoard = styled.div<{ compact?: boolean }>`

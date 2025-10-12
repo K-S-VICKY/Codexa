@@ -17,9 +17,9 @@ const StatItem = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 8px 12px;
-  background: #2d2d30;
-  border-radius: 6px;
-  border: 1px solid #3e3e42;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
   min-width: 60px;
 `;
 
@@ -32,7 +32,7 @@ const StatValue = styled.span<{ color: string }>`
 
 const StatLabel = styled.span`
   font-size: 11px;
-  color: #999;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-top: 2px;
@@ -41,7 +41,7 @@ const StatLabel = styled.span`
 const ProgressBar = styled.div`
   flex: 1;
   height: 4px;
-  background: #333;
+  background: #e5e7eb;
   border-radius: 2px;
   overflow: hidden;
   margin-left: 16px;
@@ -56,7 +56,7 @@ const ProgressFill = styled.div<{ percentage: number; color: string }>`
 
 const CompletionText = styled.span`
   font-size: 12px;
-  color: #999;
+  color: #6b7280;
   margin-left: 8px;
 `;
 
@@ -65,10 +65,10 @@ export const TaskStats: React.FC<TaskStatsProps> = ({ stats }) => {
   const completionPercentage = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
 
   const getCompletionColor = (percentage: number) => {
-    if (percentage === 0) return '#666';
-    if (percentage < 30) return '#ff4757';
-    if (percentage < 70) return '#ffa502';
-    return '#2ed573';
+    if (percentage === 0) return '#9ca3af';
+    if (percentage < 30) return '#ef4444';
+    if (percentage < 70) return '#f59e0b';
+    return '#10b981';
   };
 
   return (

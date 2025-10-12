@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { Task, TaskPriority, TaskFormData } from '../types/task';
+import { Task, TaskFormData } from '../types/task';
 
 interface TaskFormProps {
   task: Task | null;
@@ -14,7 +14,7 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,14 +22,15 @@ const Overlay = styled.div`
 `;
 
 const FormContainer = styled.div`
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 20px;
   width: 90%;
-  max-width: 500px;
+  max-width: 520px;
   max-height: 80vh;
   overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 `;
 
 const FormHeader = styled.div`
@@ -42,21 +43,21 @@ const FormHeader = styled.div`
 const FormTitle = styled.h3`
   margin: 0;
   font-size: 16px;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 700;
+  color: #111827;
 `;
 
 const CloseButton = styled.button`
   background: transparent;
   border: none;
-  color: #cccccc;
+  color: #6b7280;
   font-size: 20px;
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 6px;
   
   &:hover {
-    background: #333;
+    background: #f3f4f6;
   }
 `;
 
@@ -74,37 +75,37 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   font-size: 12px;
-  font-weight: 500;
-  color: #cccccc;
+  font-weight: 600;
+  color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
 
 const Input = styled.input`
-  background: #1e1e1e;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 8px 12px;
-  color: #ffffff;
+  color: #111827;
   font-size: 14px;
   
   &:focus {
     outline: none;
-    border-color: #007acc;
-    box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
   
   &::placeholder {
-    color: #666;
+    color: #9ca3af;
   }
 `;
 
 const TextArea = styled.textarea`
-  background: #1e1e1e;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 8px 12px;
-  color: #ffffff;
+  color: #111827;
   font-size: 14px;
   resize: vertical;
   min-height: 80px;
@@ -112,33 +113,33 @@ const TextArea = styled.textarea`
   
   &:focus {
     outline: none;
-    border-color: #007acc;
-    box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
   
   &::placeholder {
-    color: #666;
+    color: #9ca3af;
   }
 `;
 
 const Select = styled.select`
-  background: #1e1e1e;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 8px 12px;
-  color: #ffffff;
+  color: #111827;
   font-size: 14px;
   cursor: pointer;
   
   &:focus {
     outline: none;
-    border-color: #007acc;
-    box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
   
   option {
-    background: #1e1e1e;
-    color: #ffffff;
+    background: #ffffff;
+    color: #111827;
   }
 `;
 
@@ -151,33 +152,28 @@ const ButtonGroup = styled.div`
 
 const Button = styled.button<{ variant: 'primary' | 'secondary' }>`
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 9999px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: background-color 0.2s ease;
-  
+  border: 2px solid transparent;
+  transition: box-shadow 0.2s ease, transform 0.05s ease, opacity 0.2s ease;
+
   ${props => props.variant === 'primary' ? `
-    background: #007acc;
-    color: white;
+    background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #8b5cf6, #22d3ee);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    color: #111827;
     
-    &:hover {
-      background: #005a9e;
-    }
-    
-    &:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
+    &:hover { box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
   ` : `
-    background: transparent;
-    color: #cccccc;
-    border: 1px solid #3e3e42;
+    background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #9ca3af, #d1d5db);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    color: #374151;
     
-    &:hover {
-      background: #333;
-    }
+    &:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
   `}
 `;
 
