@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Editor } from './Editor';
 import { File, RemoteFile, Type } from './external/editor/utils/file-manager';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -90,6 +90,9 @@ const RightPanel = styled.div`
   background: rgba(15, 23, 42, 0.2);
   display: flex;
   flex-direction: column;
+  /* critical for flex children to be scrollable instead of growing */
+  min-height: 0;
+  overflow: hidden;
 `;
 
 // Modal styles
@@ -218,6 +221,8 @@ export const CodingPagePostPodCreation = () => {
   const [showPortSelector, setShowPortSelector] = useState(false);
   const [selectedPort, setSelectedPort] = useState<number>(3000);
   const [downloading, setDownloading] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
 
   // Pomodoro state
   const [showPomodoro, setShowPomodoro] = useState(false);
@@ -375,6 +380,61 @@ export const CodingPagePostPodCreation = () => {
     });
   };
 
+  // Import Project (folder picker)
+  const handleClickImport = () => {
+    folderInputRef.current?.click();
+  };
+
+  const ensureFolders = async (dirPath: string) => {
+    if (!socket) return;
+    const segments = dirPath.split('/').filter(Boolean);
+    let cur = '';
+    for (const seg of segments) {
+      cur = cur ? `${cur}/${seg}` : seg;
+      await new Promise<void>((resolve) => {
+        socket.emit('createFolder', { path: cur }, () => resolve());
+      });
+    }
+  };
+
+  const importFolderFiles = async (fileList: FileList) => {
+    if (!socket) return;
+    setImporting(true);
+    try {
+      // Convert to array and sort by path depth so folders/files process deterministically
+      const files = Array.from(fileList).filter(f => !!(f as any).webkitRelativePath);
+      // Determine top folder to strip from paths
+      const rootPrefix = files[0] ? (files[0] as any).webkitRelativePath.split('/')[0] : '';
+
+      for (const f of files) {
+        const webkitPath: string = (f as any).webkitRelativePath || f.name;
+        // Strip the top-level folder name
+        const relAfterRoot = webkitPath.startsWith(rootPrefix + '/') ? webkitPath.slice(rootPrefix.length + 1) : webkitPath;
+        const normPath = relAfterRoot.replace(/\\+/g, '/');
+        const dir = normPath.split('/').slice(0, -1).join('/');
+        if (dir) {
+          await ensureFolders(dir);
+        }
+        // Create file then write content
+        await new Promise<void>((resolve) => {
+          socket.emit('createFile', { path: normPath }, () => resolve());
+        });
+        const content = await f.text();
+        await new Promise<void>((resolve) => {
+          socket.emit('updateContent', { path: normPath, content }, () => resolve());
+        });
+      }
+      refreshFileStructure();
+      alert('Import completed');
+    } catch (e) {
+      console.error('Import failed:', e);
+      alert('Import failed');
+    } finally {
+      setImporting(false);
+      if (folderInputRef.current) folderInputRef.current.value = '';
+    }
+  };
+
   const onSelect = (file: File) => {
     if (file.type === Type.DIRECTORY) {
       socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
@@ -419,6 +479,22 @@ export const CodingPagePostPodCreation = () => {
             <StatusDot connected={true} />
             Connected
           </StatusIndicator>
+          <input
+            type="file"
+            ref={folderInputRef}
+            style={{ display: 'none' }}
+            // @ts-ignore - webkitdirectory is non-standard but supported in Chromium/Edge
+            webkitdirectory=""
+            multiple
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                importFolderFiles(e.target.files);
+              }
+            }}
+          />
+          <Button variant="gradientOutline" size="sm" onClick={handleClickImport} disabled={importing}>
+            {importing ? 'Importing…' : 'Import Project'}
+          </Button>
           <Button variant="gradientOutline" size="sm" onClick={downloadProject} disabled={downloading}>
             {downloading ? 'Preparing Zip…' : 'Download Project'}
           </Button>
@@ -446,7 +522,9 @@ export const CodingPagePostPodCreation = () => {
           )}
         </LeftPanel>
         <RightPanel>
-          {socket && <TerminalComponent socket={socket} />}
+          <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+            {socket && <TerminalComponent socket={socket} />}
+          </div>
         </RightPanel>
       </Workspace>
 
